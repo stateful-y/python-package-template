@@ -95,3 +95,18 @@ def serve_docs(session: nox.Session) -> None:
     session.run("mkdocs", "build", "--clean", external=True)
     session.log("###### Starting local server. Press Control+C to stop server ######")
     session.run("mkdocs", "serve", "-a", "localhost:8080", external=True)
+
+
+@nox.session(venv_backend="uv")
+def deploy_docs(session: nox.Session) -> None:
+    """Build fresh docs and deploy them to GitHub Pages."""
+    # Install dependencies
+    session.run_install(
+        "uv",
+        "sync",
+        "--group",
+        "docs",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+    )
+    # Deploy docs to GitHub pages
+    session.run("mkdocs", "gh-deploy", "--clean", external=True)

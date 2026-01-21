@@ -16,12 +16,12 @@ test:
 test-cov:
     uv run pytest --cov --cov-report=html --cov-report=term
 
-# Lint code
+# Run linters
 lint:
     uvx nox -s lint
 
-# Format and fix code
-fix:
+# Format and fix code (via pre-commit)
+format fix:
     uvx nox -s fix
 
 # Check code (lint + format check)
