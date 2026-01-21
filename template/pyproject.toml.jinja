@@ -62,6 +62,7 @@ line-length = 120
 target-version = "py{{ python_version.replace('.', '') }}"
 src = ["src", "tests"]
 show-fixes = true
+exclude = ["src/{{ package_name }}/_version.py"]
 
 [tool.ruff.format]
 preview = true
@@ -127,6 +128,7 @@ plugins = ["covdefaults"]
 omit = [
     "*/tests/*",
     "*/__pycache__/*",
+    "*/_version.py",
 ]
 
 [tool.coverage.report]
