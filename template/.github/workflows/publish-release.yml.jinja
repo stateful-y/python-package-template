@@ -40,7 +40,7 @@ jobs:
       - name: Extract release notes from CHANGELOG
         id: release_notes
         run: |
-          VERSION="${{ steps.find_tag.outputs.version }}"
+          VERSION="{% raw %}${{ steps.find_tag.outputs.version }}{% endraw %}"
 
           # Extract the section for this version from CHANGELOG.md
           # This uses awk to get content between the version header and the next version header
