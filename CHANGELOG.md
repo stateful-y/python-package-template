@@ -5,18 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
 
-### Added
-- Automated release notes generation with git-cliff
-- Conventional commit enforcement with commitizen
-- Automatic CHANGELOG.md updates on release
-- GitHub Release creation with generated notes
+## [0.2.0] - 2026-01-21
 
-### Removed
-- Removed non-functional `include_docker` prompt that had no implementation
+This **minor release** includes 13 commits.
+
+
+### Features
+- Automate release notes with git-cliff and commitizen  ([#6](https://github.com/gtauzin/python-package-copier-template/pull/6)) by @gtauzin
+- Align template repo tooling with generated projects  ([#7](https://github.com/gtauzin/python-package-copier-template/pull/7)) by @gtauzin
+- Enrich CHANGELOG generation with metadata and fix lint issues  ([#21](https://github.com/gtauzin/python-package-copier-template/pull/21)) by @gtauzin
+
+### Bug Fixes
+- Remove non-functional include_docker prompt  ([#5](https://github.com/gtauzin/python-package-copier-template/pull/5)) by @gtauzin
+- Use PR instead of direct push for CHANGELOG updates  ([#8](https://github.com/gtauzin/python-package-copier-template/pull/8), [#9](https://github.com/gtauzin/python-package-copier-template/pull/9), [#10](https://github.com/gtauzin/python-package-copier-template/pull/10), [#11](https://github.com/gtauzin/python-package-copier-template/pull/11)) by @gtauzin
+- Create GitHub Release after changelog PR is merged  ([#13](https://github.com/gtauzin/python-package-copier-template/pull/13), [#15](https://github.com/gtauzin/python-package-copier-template/pull/15), [#17](https://github.com/gtauzin/python-package-copier-template/pull/17), [#19](https://github.com/gtauzin/python-package-copier-template/pull/19), [#23](https://github.com/gtauzin/python-package-copier-template/pull/23)) by @gtauzin
+
+### Contributors
+
+Thanks to all contributors for this release:
+- @gtauzin
 
 ## [0.1.0] - 2026-01-20
+
+This **minor release** includes 1 commit.
 
 ### Added
 - Modern Python package template using Copier
@@ -33,3 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiple license options (MIT, Apache-2.0, BSD-3-Clause, GPL-3.0, Proprietary)
 - Example code and tests
 - Full documentation structure
+
+### Contributors
+
+Thanks to all contributors for this release:
+- @gtauzin
