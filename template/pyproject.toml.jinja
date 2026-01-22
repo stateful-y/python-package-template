@@ -43,11 +43,18 @@ docs = [
     "mkdocs>=1.6.0",
     "mkdocs-material>=9.7",
     "mkdocstrings[python]>=0.26.0",
+{% if include_examples %}
+    "mkdocs-marimo>=0.2.0",
+{% endif %}
 ]
 fix = [
   "pre-commit-uv>=4.1",
 ]
-examples = []
+examples = [
+{% if include_examples %}
+    "marimo>=0.19.0",
+    "plotly>=6.5.0",
+{% endif %}]
 
 [project.urls]
 Homepage = "https://github.com/{{ github_username }}/{{ project_slug }}"

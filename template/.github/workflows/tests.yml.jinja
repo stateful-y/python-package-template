@@ -111,4 +111,29 @@ jobs:
 
       - name: Run docstring tests
         run: nox -s doctest
+{% if include_examples %}
+
+  examples:
+    name: Run example notebooks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: "pyproject.toml"
+
+      - name: Install nox
+        run: uv tool install nox
+
+      - name: Set up Python
+        run: uv python install {{ python_version }}
+
+      - name: Run example notebooks
+        run: nox -s run_examples
+{% endif %}
 {% endif %}

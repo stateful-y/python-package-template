@@ -85,3 +85,8 @@ include_github_actions:
   type: bool
   help: "Include GitHub Actions CI/CD workflows?"
   default: true
+
+include_examples:
+  type: bool
+  help: "Include examples/ directory with marimo notebooks?"
+  default: true

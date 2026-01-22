@@ -18,6 +18,7 @@ def test_template_creates_project(copie):
         "tests",
         ".github",
         ".github/workflows",
+        "examples",
     ]
 
     result = copie.copy()
@@ -292,3 +293,113 @@ def test_doctest_configuration(copie):
     example_py = (result.project_dir / "src" / "test_project" / "example.py").read_text()
     assert "Examples:" in example_py
     assert ">>>" in example_py
+
+
+def test_examples_directory_when_enabled(copie):
+    """Test that examples directory is created when include_examples=True."""
+    result = copie.copy(
+        extra_answers={
+            "include_examples": True,
+        },
+    )
+
+    assert result.exit_code == 0
+    examples_dir = result.project_dir / "examples"
+    assert examples_dir.is_dir(), "examples/ directory not created"
+
+    # Check for notebook file
+    hello_notebook = examples_dir / "hello.py"
+    assert hello_notebook.is_file(), "examples/hello.py not created"
+
+    # Check notebook content
+    notebook_content = hello_notebook.read_text()
+    assert "import marimo" in notebook_content
+    assert "app = marimo.App" in notebook_content
+    assert "plotly" in notebook_content
+    assert "num_points" in notebook_content
+
+    # Check marimo in dependencies
+    pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+    assert "marimo" in pyproject_content
+    assert "plotly" in pyproject_content
+    assert "mkdocs-marimo" in pyproject_content
+
+    # Check noxfile has run_examples session
+    noxfile_content = (result.project_dir / "noxfile.py").read_text()
+    assert "def run_examples(session:" in noxfile_content
+    assert "examples/hello.py" in noxfile_content
+
+    # Check justfile has example command
+    justfile_content = (result.project_dir / "justfile").read_text()
+    assert "example:" in justfile_content
+    assert "marimo edit" in justfile_content
+
+    # Check examples.md exists
+    examples_md = result.project_dir / "docs" / "examples.md"
+    assert examples_md.is_file(), "docs/examples.md not created"
+
+    # Check mkdocs.yml includes examples in nav
+    mkdocs_content = (result.project_dir / "mkdocs.yml").read_text()
+    assert "Examples: examples.md" in mkdocs_content
+
+    # Check GitHub workflow includes examples job
+    tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
+    workflow_content = tests_workflow.read_text()
+    assert "examples:" in workflow_content
+    assert "nox -s run_examples" in workflow_content
+
+
+def test_examples_directory_when_disabled(copie):
+    """Test that examples directory is NOT created when include_examples=False."""
+    result = copie.copy(
+        extra_answers={
+            "include_examples": False,
+        },
+    )
+
+    assert result.exit_code == 0
+    examples_dir = result.project_dir / "examples"
+    # Directory may exist but should be empty or not have content
+    if examples_dir.exists():
+        # Directory might exist but should not have any meaningful files
+        py_files = list(examples_dir.glob("*.py"))
+        assert len(py_files) == 0 or all(f.read_text().strip() == "" for f in py_files), (
+            "examples/ directory should be empty or not have valid notebooks"
+        )
+
+    # Or the directory doesn't exist, which is also fine
+    # Check notebook file doesn't exist or is empty
+    hello_notebook = result.project_dir / "examples" / "hello.py"
+    if hello_notebook.exists():
+        assert hello_notebook.read_text().strip() == "", "examples/hello.py should be empty"
+
+    # Marimo should not be in examples dependencies
+    pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+    # examples group should be empty
+    assert "examples = []" in pyproject_content or "examples = [\n]" in pyproject_content
+
+    # Check noxfile doesn't have run_examples session
+    noxfile_content = (result.project_dir / "noxfile.py").read_text()
+    assert "def run_examples(session:" not in noxfile_content
+
+    # Check justfile doesn't have example command
+    justfile_content = (result.project_dir / "justfile").read_text()
+    # Should not have the example command, but might have other content
+    lines = justfile_content.split("\n")
+    example_command_lines = [line for line in lines if line.strip().startswith("example:")]
+    assert len(example_command_lines) == 0, "example command should not exist"
+
+    # Check examples.md doesn't exist or is empty
+    examples_md = result.project_dir / "docs" / "examples.md"
+    if examples_md.exists():
+        content = examples_md.read_text()
+        assert content.strip() == "", "docs/examples.md should be empty when examples are disabled"
+
+    # Check mkdocs.yml doesn't include examples in nav
+    mkdocs_content = (result.project_dir / "mkdocs.yml").read_text()
+    assert "Examples: examples.md" not in mkdocs_content
+
+    # Check GitHub workflow doesn't include examples job
+    tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
+    workflow_content = tests_workflow.read_text()
+    assert "run_examples" not in workflow_content

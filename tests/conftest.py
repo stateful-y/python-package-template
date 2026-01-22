@@ -29,6 +29,7 @@ class CopierTestFixture:
             "version": "0.1.0",
             "python_version": "3.10",
             "license": "MIT",
+            "include_examples": True,
         }
 
         # Override with extra answers

@@ -116,6 +116,25 @@ def doctest(session: nox.Session) -> None:
         *session.posargs,
     )
 
+{% if include_examples %}
+
+@nox.session(venv_backend="uv")
+def run_examples(session: nox.Session) -> None:
+    """Run marimo notebook examples to validate they execute."""
+    # Install dependencies
+    session.run_install(
+        "uv",
+        "sync",
+        "--no-default-groups",
+        "--group",
+        "examples",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+    )
+
+    # Run marimo notebooks as scripts (non-interactive execution)
+    session.run("python", "examples/hello.py", *session.posargs)
+{% endif %}
+
 
 @nox.session(venv_backend="uv")
 def lint(session: nox.Session) -> None:
