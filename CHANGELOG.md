@@ -22,6 +22,7 @@ This **minor release** includes 3 commits.
 
 Thanks to all contributors for this release:
 - @gtauzin
+
 ## [0.4.0] - 2026-01-28
 
 This **minor release** includes 4 commits.
