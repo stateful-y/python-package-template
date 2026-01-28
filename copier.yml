@@ -71,7 +71,7 @@ license:
     - "GPL-3.0"
     - "Proprietary"
 
-python_version:
+min_python_version:
   type: str
   help: "Minimum Python version"
   default: "3.11"
