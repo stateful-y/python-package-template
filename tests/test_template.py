@@ -64,7 +64,7 @@ def test_generated_project_structure(copie):
     # Check docs
     docs_dir = result.project_dir / "docs"
     assert (docs_dir / "index.md").is_file()
-    assert (docs_dir / "contributing.md").is_file()
+    assert (docs_dir / "pages" / "contributing.md").is_file()
 
     # Check GitHub workflows
     workflows_dir = result.project_dir / ".github" / "workflows"
@@ -335,12 +335,12 @@ def test_examples_directory_when_enabled(copie):
     assert "marimo edit" in justfile_content
 
     # Check examples.md exists
-    examples_md = result.project_dir / "docs" / "examples.md"
-    assert examples_md.is_file(), "docs/examples.md not created"
+    examples_md = result.project_dir / "docs" / "pages" / "examples.md"
+    assert examples_md.is_file(), "docs/pages/examples.md not created"
 
     # Check mkdocs.yml includes examples in nav
     mkdocs_content = (result.project_dir / "mkdocs.yml").read_text()
-    assert "Examples: examples.md" in mkdocs_content
+    assert "Examples: pages/examples.md" in mkdocs_content
 
     # Check GitHub workflow includes examples job
     tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
