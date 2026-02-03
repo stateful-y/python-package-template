@@ -81,9 +81,9 @@ markdown_extensions:
 
 # Exclude exported HTML files and marimo-generated files from mkdocs processing
 {% if include_examples %}
-exclude_docs:
-  - examples/**/index.html
-  - examples/**/CLAUDE.md
+exclude_docs: |
+  examples/**/index.html
+  examples/**/CLAUDE.md
 {% endif %}
 
 validation:
