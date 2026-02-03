@@ -361,9 +361,9 @@ def test_examples_directory_when_enabled(copie):
     assert "examples:" in workflow_content
     assert "nox -s run_examples" in workflow_content
 
-    # Check README mentions examples
+    # Check README mentions examples (in "Where can I learn more?" section)
     readme_content = (result.project_dir / "README.md").read_text()
-    assert "## Examples" in readme_content
+    assert "Interactive Examples:" in readme_content or "examples/" in readme_content
     assert "marimo edit examples/hello.py" in readme_content
 
     # Check CONTRIBUTING mentions adding examples
