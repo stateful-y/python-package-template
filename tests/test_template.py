@@ -644,8 +644,12 @@ def test_markdown_docs_created_and_clean(copie):
         assert len(content) > 0, f"{md_file} is empty"
 
         # Should not contain raw HTML tags from mkdocs-material
+        # Exception: index.md can contain <div class="grid cards"> for Material CTA cards
         html_tags_to_check = ["<article", "<div class=", "<nav class=", "<header class="]
         for tag in html_tags_to_check:
+            # Allow <div class=> in index.md for Material grid cards feature
+            if tag == "<div class=" and md_file.name == "index.md":
+                continue
             assert tag not in content, f"{md_file.name} contains HTML tag: {tag}"
 
         # Should contain markdown formatting

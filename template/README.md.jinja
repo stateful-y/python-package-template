@@ -103,23 +103,17 @@ Define your [settings/options] in the `[config file]` located in [location]. Thi
 
 [Additional context about what happens when this runs, e.g., "The [interface/UI] will be available at http://127.0.0.1:XXXX"]
 
-{% if include_examples %}
-For a concrete use-case, see the [{{ project_name }} example repository](https://github.com/{{ github_username }}/{{ project_slug }}-example).
-{% endif %}
+## How do I use {{ project_name }}?
+
+Full documentation is available at [https://{{ project_slug }}.readthedocs.io/](https://{{ project_slug }}.readthedocs.io/).
 
 {% if include_examples %}
-## Examples
-
 Interactive examples are available in the `examples/` directory:
 
 - **Online**: [https://{{ project_slug }}.readthedocs.io/en/latest/pages/examples/](https://{{ project_slug }}.readthedocs.io/en/latest/pages/examples/)
 - **Locally**: Run `marimo edit examples/hello.py` to open an interactive notebook
 
 {% endif %}
-## How do I use {{ project_name }}?
-
-Full documentation is available at [https://{{ project_slug }}.readthedocs.io/](https://{{ project_slug }}.readthedocs.io/).
-
 ## Can I contribute?
 
 We welcome contributions, feedback, and questions:
