@@ -30,11 +30,14 @@ class TestDocsIndexContent:
 
         content = docs_index.read_text()
 
-        # Should include project name
+        # Should include project name in welcome heading and throughout
         assert "My Awesome Tool" in content
+        assert "Welcome to My Awesome Tool's documentation" in content
 
-        # Should include description
-        assert "A powerful tool for data analysis" in content
+        # Should include CTA cards with proper structure
+        assert "Get Started in 5 Minutes" in content
+        assert "Need Help?" in content
+        assert "Learn the Concepts" in content
 
     def test_docs_index_structure(self, copie):
         """Test that docs index has proper markdown structure."""
