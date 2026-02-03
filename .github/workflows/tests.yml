@@ -5,6 +5,7 @@ on:
     branches: [main, "release/*"]
   pull_request:
     branches: [main, "release/*"]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
     inputs:
       run_slow_tests:
@@ -41,11 +42,14 @@ jobs:
         run: |
           uvx nox -s tests-${{ matrix.python-version }} -- -m "not slow and not integration" -v
 
-  # Slow integration tests only run on main branch pushes or manual trigger
+  # Integration tests run on main branch, non-draft PRs, or manual trigger
   test-integration:
-    name: Integration tests (slow)
+    name: Integration tests
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.event.inputs.run_slow_tests == 'true'
+    if: |
+      github.ref == 'refs/heads/main' ||
+      github.event.inputs.run_slow_tests == 'true' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     strategy:
       matrix:
         python-version: ["3.11", "3.14"]  # Test oldest and newest only for speed
