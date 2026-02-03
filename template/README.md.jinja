@@ -53,6 +53,16 @@ print(greeting)  # Output: Hello, World!
 
 Full documentation is available at [https://{{ project_slug }}.readthedocs.io/](https://{{ project_slug }}.readthedocs.io/)
 
+{% if include_examples %}
+## Examples
+
+Interactive examples are available in the `examples/` directory. View them:
+
+- **Online**: [https://{{ project_slug }}.readthedocs.io/en/latest/pages/examples/](https://{{ project_slug }}.readthedocs.io/en/latest/pages/examples/)
+- **Locally**: Run `marimo edit examples/hello.py` to open an interactive notebook
+- **Standalone**: Each example has a standalone HTML version in the documentation
+
+{% endif %}
 ## Development
 
 ### Prerequisites

@@ -40,7 +40,6 @@ def tests_coverage(session: nox.Session) -> None:
     session.run(
         "coverage",
         "run",
-        "--parallel-mode",
         "--source=src/{{ package_name }}",
         "-m",
         "pytest",
@@ -49,10 +48,7 @@ def tests_coverage(session: nox.Session) -> None:
         *session.posargs,
     )
 
-    # Combine coverage data from parallel runs
-    session.run("coverage", "combine")
-
-    # HTML report, ignoring parse errors and without contexts
+    # Generate HTML and XML reports
     session.run("coverage", "html", "--ignore-errors", "-d", session.create_tmp())
 
     # XML report for CI
@@ -171,8 +167,9 @@ def build_docs(session: nox.Session) -> None:
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
 
-    # Build the docs
+    # Build the docs (hooks automatically export notebooks and prepare site)
     session.run("mkdocs", "build", "--clean", external=True)
+
 
 
 @nox.session(venv_backend="uv")
@@ -188,7 +185,6 @@ def serve_docs(session: nox.Session) -> None:
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
 
-    # Build and serve the docs
-    session.run("mkdocs", "build", "--clean", external=True)
+    # Serve the docs (hooks automatically export notebooks and prepare site)
     session.log("###### Starting local server. Press Control+C to stop server ######")
     session.run("mkdocs", "serve", "-a", "localhost:8080", external=True)

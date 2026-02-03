@@ -149,6 +149,40 @@ View all available commands:
 just --list
 ```
 
+{% if include_examples %}
+### Adding Examples
+
+To add a new example notebook:
+
+1. Create a new marimo notebook in `examples/<name>.py`:
+
+   ```bash
+   marimo new examples/<name>.py
+   ```
+
+2. Develop your example in the marimo editor
+
+3. Test it runs correctly:
+
+   ```bash
+   marimo edit examples/<name>.py
+   ```
+
+4. Export for documentation:
+
+   ```bash
+   uvx nox -s export_examples
+   ```
+
+5. Add a link to your example in `docs/pages/examples.md`:
+
+   ```markdown
+   - [Example Name](../examples/<name>/) - Brief description
+   ```
+
+6. Commit all changes including the exported HTML
+
+{% endif %}
 ## Submitting Changes
 
 1. Push your changes to your fork:

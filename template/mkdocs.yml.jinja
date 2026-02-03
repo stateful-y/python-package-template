@@ -5,6 +5,9 @@ repo_url: https://github.com/{{ github_username }}/{{ project_slug }}
 repo_name: {{ github_username }}/{{ project_slug }}
 edit_uri: edit/main/docs/
 
+hooks:
+  - docs/hooks.py
+
 theme:
   name: material
   custom_dir: docs/material/overrides
@@ -78,6 +81,13 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
+
+# Exclude exported marimo files from mkdocs processing (copied manually in noxfile)
+{% if include_examples %}
+exclude_docs: |
+  examples/**/index.html
+  examples/**/CLAUDE.md
+{% endif %}
 
 validation:
   nav:
