@@ -590,3 +590,123 @@ def test_marimo_notebook_export_to_html(copie):
     # Verify the HTML is standalone (not just a stub)
     assert "<html" in html_content.lower(), "HTML doesn't have html tag"
     assert "<script" in html_content.lower(), "HTML doesn't have script tags"
+
+    # Verify HTML file has reasonable size (marimo HTML exports are typically 20KB+)
+    html_size_kb = len(html_content) / 1024
+    assert html_size_kb > 10, f"HTML file is only {html_size_kb:.1f}KB, suspiciously small"
+
+
+def test_markdown_docs_created_and_clean(copie):
+    """Test that markdown files are created during build and are clean (no HTML tags)."""
+    import subprocess
+
+    result = copie.copy(
+        extra_answers={
+            "include_examples": True,
+        },
+    )
+
+    assert result.exit_code == 0
+
+    # Build the docs which should create markdown copies
+    build_result = subprocess.run(
+        ["uvx", "nox", "-s", "build_docs"],
+        cwd=result.project_dir,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+    )
+
+    assert build_result.returncode == 0, (
+        f"build_docs failed:\nSTDOUT:\n{build_result.stdout}\n\nSTDERR:\n{build_result.stderr}"
+    )
+
+    # Verify site directory exists
+    site_dir = result.project_dir / "site"
+    assert site_dir.is_dir(), "site/ directory not created by build_docs"
+
+    # Find all markdown files in site/
+    md_files = list(site_dir.rglob("*.md"))
+    assert len(md_files) > 0, f"No markdown files found in site/. Site structure: {list(site_dir.iterdir())}"
+
+    # Verify key markdown files exist
+    expected_md_files = ["index.md", "getting-started.md", "user-guide.md", "api-reference.md"]
+    found_names = {f.name for f in md_files}
+    for expected in expected_md_files:
+        assert expected in found_names, f"{expected} not found in site/. Found: {found_names}"
+
+    # Verify markdown files contain content and are clean (no HTML tags)
+    for md_file in md_files:
+        content = md_file.read_text()
+        assert len(content) > 0, f"{md_file} is empty"
+
+        # Should not contain raw HTML tags from mkdocs-material
+        html_tags_to_check = ["<article", "<div class=", "<nav class=", "<header class="]
+        for tag in html_tags_to_check:
+            assert tag not in content, f"{md_file.name} contains HTML tag: {tag}"
+
+        # Should contain markdown formatting
+        # At least one of these markdown elements should be present
+        has_markdown = any(marker in content for marker in ["# ", "## ", "- ", "* ", "[", "```", "**", "__"])
+        assert has_markdown, f"{md_file.name} doesn't appear to contain markdown formatting"
+
+
+def test_three_tier_documentation_system(copie):
+    """Test that all three documentation tiers work together."""
+    import subprocess
+
+    result = copie.copy(
+        extra_answers={
+            "include_examples": True,
+        },
+    )
+
+    assert result.exit_code == 0
+
+    # Tier 1: Verify embedded marimo setup in examples.md
+    examples_md = result.project_dir / "docs" / "pages" / "examples.md"
+    examples_content = examples_md.read_text()
+    # Check for either marimo embed directive or inline marimo code
+    has_marimo = "marimo-embed-file" in examples_content or "```python {marimo}" in examples_content
+    assert has_marimo, "Embedded marimo notebook not found in examples.md"
+
+    # Tier 2: Export standalone HTML
+    export_result = subprocess.run(
+        ["uvx", "nox", "-s", "export_examples"],
+        cwd=result.project_dir,
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+    assert export_result.returncode == 0
+    standalone_html = result.project_dir / "docs" / "examples" / "hello" / "index.html"
+    assert standalone_html.is_file(), "Standalone HTML not created (Tier 2)"
+
+    # Verify examples.md links to standalone HTML
+    assert "Standalone HTML Notebooks" in examples_content, "No standalone section in examples.md"
+    assert "../examples/hello/" in examples_content, "No link to standalone HTML in examples.md"
+
+    # Verify mkdocs excludes standalone HTML from processing
+    mkdocs_yml = result.project_dir / "mkdocs.yml"
+    mkdocs_content = mkdocs_yml.read_text()
+    assert "exclude_docs: examples/**/index.html" in mkdocs_content, "mkdocs.yml doesn't exclude standalone HTML files"
+
+    # Tier 3: Build docs and create markdown copies
+    build_result = subprocess.run(
+        ["uvx", "nox", "-s", "build_docs"],
+        cwd=result.project_dir,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+    )
+    assert build_result.returncode == 0
+    markdown_copy = result.project_dir / "site" / "index.md"
+    assert markdown_copy.is_file(), "Markdown copy not created (Tier 3)"
+
+    # Verify all three tiers are present
+    assert examples_md.is_file(), "Tier 1 (embedded) missing"
+    assert standalone_html.is_file(), "Tier 2 (standalone HTML) missing"
+    assert markdown_copy.is_file(), "Tier 3 (markdown copies) missing"
