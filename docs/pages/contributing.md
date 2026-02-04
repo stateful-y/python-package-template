@@ -71,11 +71,17 @@ def test_generated_project_builds(copie):
 
 ### CI Test Strategy
 
-The CI pipeline uses a two-tier testing strategy:
+The CI pipeline uses a two-tier testing strategy optimized for fast feedback:
 
-1. **Fast tests** (`test-fast` job): Runs on every push and PR across all OS (Ubuntu, Windows, macOS) and Python versions. Provides quick feedback (typically < 5 minutes).
+1. **Fast tests** (`test-fast` job): Runs on minimum and maximum Python versions (3.11, 3.14) only:
+   - **Draft PRs**: Ubuntu only (2 jobs) - Quick feedback in ~2-3 minutes
+   - **Ready PRs/Main**: All OS - Ubuntu, Windows, macOS (6 jobs) - Cross-platform validation
 
-2. **Full test suite** (`test-full` job): Runs all tests (fast + slow + integration) on Ubuntu only when the PR is not in draft mode or on the main branch.
+2. **Full test suite** (`test-full` job): Runs all tests (fast + slow + integration) on Ubuntu across all Python versions (3.11-3.14) when the PR is not in draft mode or on the main branch (4 jobs).
+
+**Total CI jobs:**
+- Draft PRs: 3 jobs (2 test + 1 lint)
+- Ready PRs: 11 jobs (6 test-fast + 4 test-full + 1 lint)
 
 ### Manual Testing
 
