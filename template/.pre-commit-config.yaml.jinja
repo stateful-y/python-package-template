@@ -26,7 +26,8 @@ repos:
     hooks:
     -   id: interrogate
         types: [python]
-        exclude: ^(tests/|.*_version\.py$)
+        files: ^src/
+        exclude: .*_version\.py$
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.9.9
@@ -42,7 +43,8 @@ repos:
     hooks:
       - id: ty
         name: ty
-        entry: ty
+        entry: uv run ty check src
         language: system
         types: [python]
         files: ^src/
+        pass_filenames: false

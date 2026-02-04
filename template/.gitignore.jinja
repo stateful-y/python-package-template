@@ -72,6 +72,15 @@ site/
 # Ruff
 .ruff_cache/
 
+# build
+uv.lock
+src/{{ project_slug }}/_version.py
+
+{% if include_examples %}
+# Documentation examples
+docs/examples/*/
+
+{% endif %}
 # AI Assistant Instructions
 CLAUDE.md
 CLAUDE_INSTRUCTIONS.md

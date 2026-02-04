@@ -437,53 +437,9 @@ graph LR
     G --> H[Create GitHub<br/>Release]
     H --> I{Manual<br/>Approval}
     I -->|Approve| J[Publish to PyPI]
-    style I fill:#ff9,stroke:#333,stroke-width:2px
-    style J fill:#9f9,stroke:#333,stroke-width:2px
+    style I fill:#f59e0b,stroke:#333,stroke-width:2px,color:#fff
+    style J fill:#10b981,stroke:#333,stroke-width:2px,color:#fff
 ```
-
-### Initial Setup (One-time)
-
-Before you can create releases, you need to configure two things:
-
-#### 1. Create a Personal Access Token for Changelog Automation
-
-1. **Create a Fine-grained Personal Access Token**:
-   - Go to GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens
-   - Click "Generate new token"
-   - Configure:
-     - **Token name**: `CHANGELOG_AUTOMATION_TOKEN`
-     - **Expiration**: 90 days or longer
-     - **Repository access**: Only select repositories → Choose this repository
-     - **Permissions**:
-       - Contents: Read and write
-       - Pull requests: Read and write
-
-2. **Add token as repository secret**:
-   - Go to repository Settings → Secrets and variables → Actions
-   - Click "New repository secret"
-   - Name: `CHANGELOG_AUTOMATION_TOKEN`
-   - Value: Paste your generated token
-
-#### 2. Configure PyPI Environment with Required Reviewers
-
-To enable the manual approval gate before PyPI publishing:
-
-1. **Set up Trusted Publishing on PyPI** (if not already done):
-   - Go to your PyPI project → Manage → Publishing
-   - Add a new publisher with:
-     - **Owner**: Your GitHub username/org
-     - **Repository**: This repository name
-     - **Workflow**: `publish-release.yml`
-     - **Environment**: `pypi`
-
-2. **Configure environment protection in GitHub**:
-   - Go to repository Settings → Environments
-   - Click on the `pypi` environment (or create it if it doesn't exist)
-   - Enable "Required reviewers"
-   - Add yourself and/or other maintainers as required reviewers
-   - Optionally set a wait timer (e.g., 5 minutes) for additional safety
-
-This ensures that no package is published to PyPI without explicit approval from a maintainer.
 
 ### How It Works
 
@@ -523,6 +479,7 @@ This ensures that no package is published to PyPI without explicit approval from
 ### Version Numbering
 
 This project uses [Semantic Versioning](https://semver.org/):
+
 - **Major** (1.0.0): Breaking changes
 - **Minor** (0.1.0): New features (backward compatible)
 - **Patch** (0.0.1): Bug fixes (backward compatible)
@@ -533,7 +490,7 @@ Use conventional commits to communicate the type of change, and select the appro
 
 If you have any questions, feel free to:
 
-- Open an issue on GitHub
-- Start a discussion in the repository
+- [Open an issue on GitHub](https://github.com/{{ github_username }}/{{ project_slug }}/issues/new)
+- [Start a discussion in the repository](https://github.com/{{ github_username }}/{{ project_slug }}/discussions)
 
 Thank you for contributing! 🎉
