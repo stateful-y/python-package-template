@@ -24,10 +24,12 @@ def test(session: nox.Session) -> None:
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
 
-    # Run tests
+    # Run tests with parallel execution
     session.run(
         "pytest",
         "tests/",
+        "-n",
+        "auto",
         "-v",
         *session.posargs,
     )
@@ -45,12 +47,14 @@ def test_fast(session: nox.Session) -> None:
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
 
-    # Run fast tests only
+    # Run fast tests only with parallel execution
     session.run(
         "pytest",
         "tests/",
         "-m",
         "not slow and not integration",
+        "-n",
+        "auto",
         "-v",
         *session.posargs,
     )
@@ -68,12 +72,14 @@ def test_slow(session: nox.Session) -> None:
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
 
-    # Run slow/integration tests only
+    # Run slow/integration tests only with parallel execution
     session.run(
         "pytest",
         "tests/",
         "-m",
         "slow or integration",
+        "-n",
+        "auto",
         "-v",
         *session.posargs,
     )

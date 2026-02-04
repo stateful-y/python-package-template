@@ -44,7 +44,7 @@ def test_option_combinations(copie, include_examples, include_actions):
     # Test hooks.py content
     hooks_file = result.project_dir / "docs" / "hooks.py"
     assert hooks_file.is_file(), "docs/hooks.py should always exist"
-    hooks_content = hooks_file.read_text()
+    hooks_content = hooks_file.read_text(encoding="utf-8")
 
     if include_examples:
         assert "on_pre_build" in hooks_content, "on_pre_build should exist when include_examples=True"
@@ -54,7 +54,7 @@ def test_option_combinations(copie, include_examples, include_actions):
         assert "marimo" not in hooks_content, "marimo logic should not exist when include_examples=False"
 
     # Test pyproject.toml dependencies
-    pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+    pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
     if include_examples:
         assert "marimo" in pyproject_content, "marimo should be in dependencies when include_examples=True"
         assert "plotly" in pyproject_content, "plotly should be in dependencies when include_examples=True"
@@ -67,7 +67,7 @@ def test_option_combinations(copie, include_examples, include_actions):
         )
 
     # Test noxfile sessions
-    noxfile_content = (result.project_dir / "noxfile.py").read_text()
+    noxfile_content = (result.project_dir / "noxfile.py").read_text(encoding="utf-8")
     if include_examples:
         assert "def run_examples(session:" in noxfile_content, (
             "run_examples session should exist when include_examples=True"
@@ -95,7 +95,7 @@ def test_all_licenses(copie, license_type):
     license_file = result.project_dir / "LICENSE"
     assert license_file.is_file(), f"LICENSE file should exist for {license_type}"
 
-    license_content = license_file.read_text()
+    license_content = license_file.read_text(encoding="utf-8")
 
     # Verify license-specific content
     if license_type == "Apache-2.0":
@@ -113,7 +113,7 @@ def test_all_licenses(copie, license_type):
         assert "Proprietary License" in license_content or "All Rights Reserved" in license_content
 
     # Verify pyproject.toml has correct license (uses table format)
-    pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+    pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
     assert f'license = {{ text = "{license_type}" }}' in pyproject_content
 
 
@@ -132,11 +132,11 @@ def test_all_python_versions(copie, python_version):
     assert result.exit_code == 0
 
     # Check pyproject.toml
-    pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+    pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
     assert f'requires-python = ">={python_version}"' in pyproject_content
 
     # Check noxfile.py Python version matrix
-    noxfile_content = (result.project_dir / "noxfile.py").read_text()
+    noxfile_content = (result.project_dir / "noxfile.py").read_text(encoding="utf-8")
     assert f'MIN_VERSION = "{python_version}"' in noxfile_content
 
     # Verify version is in the test matrix
@@ -209,7 +209,7 @@ def test_readthedocs_config_consistency(copie):
     rtd_config = result.project_dir / ".readthedocs.yml"
     assert rtd_config.is_file()
 
-    content = rtd_config.read_text()
+    content = rtd_config.read_text(encoding="utf-8")
 
     # Should specify Python version
     assert "python:" in content
@@ -230,7 +230,7 @@ def test_justfile_commands_comprehensive(copie):
     justfile = result.project_dir / "justfile"
     assert justfile.is_file()
 
-    content = justfile.read_text()
+    content = justfile.read_text(encoding="utf-8")
 
     # Essential commands (note: "fix" was renamed to "format" in template)
     expected_commands = [
@@ -257,7 +257,7 @@ def test_changelog_initial_content(copie):
     changelog = result.project_dir / "CHANGELOG.md"
     assert changelog.is_file()
 
-    content = changelog.read_text()
+    content = changelog.read_text(encoding="utf-8")
 
     # Should have changelog header
     assert "# Changelog" in content or "# CHANGELOG" in content
@@ -274,7 +274,7 @@ def test_git_cliff_config_content(copie):
     git_cliff_config = result.project_dir / ".git-cliff.toml"
     assert git_cliff_config.is_file()
 
-    content = git_cliff_config.read_text()
+    content = git_cliff_config.read_text(encoding="utf-8")
 
     # Should have conventional commits configuration
     assert "conventional_commits" in content or "conventional" in content

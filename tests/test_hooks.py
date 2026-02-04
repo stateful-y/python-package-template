@@ -33,7 +33,7 @@ def test_hooks_file_created_with_examples(copie_with_examples):
     assert hooks_file.is_file(), "docs/hooks.py not created"
 
     # Verify hooks content
-    hooks_content = hooks_file.read_text()
+    hooks_content = hooks_file.read_text(encoding="utf-8")
     assert "on_pre_build" in hooks_content, "on_pre_build hook not found"
     assert "on_files" in hooks_content, "on_files hook not found"
     assert "on_post_build" in hooks_content, "on_post_build hook not found"
@@ -50,7 +50,7 @@ def test_hooks_file_created_without_examples(copie_without_examples):
     assert hooks_file.is_file(), "docs/hooks.py not created"
 
     # Verify hooks content has minimal implementation
-    hooks_content = hooks_file.read_text()
+    hooks_content = hooks_file.read_text(encoding="utf-8")
     assert "on_files" in hooks_content, "on_files hook not found"
     assert "on_post_build" in hooks_content, "on_post_build hook not found"
 
@@ -137,7 +137,7 @@ def test_on_pre_build_exports_notebooks(copie_with_examples):
     assert html_file.is_file(), "Notebook not exported to HTML"
 
     # Verify it's a valid HTML file
-    html_content = html_file.read_text()
+    html_content = html_file.read_text(encoding="utf-8")
     assert "<html" in html_content, "Exported file is not valid HTML"
     assert "marimo" in html_content.lower(), "HTML doesn't contain marimo runtime"
 
@@ -179,7 +179,7 @@ def test_on_files_handles_missing_examples_dir(copie_with_examples, tmp_path):
 def test_hooks_integrated_in_mkdocs_yml(copie_with_examples):
     """Test that hooks are properly configured in mkdocs.yml."""
     mkdocs_yml = copie_with_examples.project_dir / "mkdocs.yml"
-    content = mkdocs_yml.read_text()
+    content = mkdocs_yml.read_text(encoding="utf-8")
 
     assert "hooks:" in content, "hooks section not found in mkdocs.yml"
     assert "docs/hooks.py" in content, "hooks.py not referenced in mkdocs.yml"

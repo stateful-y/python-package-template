@@ -28,7 +28,7 @@ class TestDocsIndexContent:
         docs_index = result.project_dir / "docs" / "index.md"
         assert docs_index.is_file()
 
-        content = docs_index.read_text()
+        content = docs_index.read_text(encoding="utf-8")
 
         # Should include project name in welcome heading and throughout
         assert "My Awesome Tool" in content
@@ -45,7 +45,7 @@ class TestDocsIndexContent:
         assert result.exit_code == 0
 
         docs_index = result.project_dir / "docs" / "index.md"
-        content = docs_index.read_text()
+        content = docs_index.read_text(encoding="utf-8")
 
         # Should have headings
         assert "#" in content
@@ -71,7 +71,7 @@ class TestGettingStartedPage:
         assert result.exit_code == 0
 
         getting_started = result.project_dir / "docs" / "pages" / "getting-started.md"
-        content = getting_started.read_text()
+        content = getting_started.read_text(encoding="utf-8")
 
         # Should mention installation
         assert "install" in content.lower()
@@ -85,7 +85,7 @@ class TestGettingStartedPage:
         assert result.exit_code == 0
 
         getting_started = result.project_dir / "docs" / "pages" / "getting-started.md"
-        content = getting_started.read_text()
+        content = getting_started.read_text(encoding="utf-8")
 
         # Should have code blocks
         assert "```" in content
@@ -111,7 +111,7 @@ class TestUserGuidePage:
         assert result.exit_code == 0
 
         user_guide = result.project_dir / "docs" / "pages" / "user-guide.md"
-        content = user_guide.read_text()
+        content = user_guide.read_text(encoding="utf-8")
 
         # Should be non-trivial
         assert len(content.strip()) > 200
@@ -137,7 +137,7 @@ class TestAPIReferencePage:
         assert result.exit_code == 0
 
         api_reference = result.project_dir / "docs" / "pages" / "api-reference.md"
-        content = api_reference.read_text()
+        content = api_reference.read_text(encoding="utf-8")
 
         # Should reference the package
         assert "custom_pkg" in content
@@ -148,7 +148,7 @@ class TestAPIReferencePage:
         assert result.exit_code == 0
 
         api_reference = result.project_dir / "docs" / "pages" / "api-reference.md"
-        content = api_reference.read_text()
+        content = api_reference.read_text(encoding="utf-8")
 
         # Should have code blocks or API documentation syntax
         assert "```" in content or "::: " in content  # mkdocstrings syntax
@@ -171,7 +171,7 @@ class TestContributingPage:
         assert result.exit_code == 0
 
         contributing = result.project_dir / "docs" / "pages" / "contributing.md"
-        content = contributing.read_text()
+        content = contributing.read_text(encoding="utf-8")
 
         # Should mention development setup
         assert "develop" in content.lower()
@@ -185,7 +185,7 @@ class TestContributingPage:
         assert result.exit_code == 0
 
         contributing = result.project_dir / "docs" / "pages" / "contributing.md"
-        content = contributing.read_text()
+        content = contributing.read_text(encoding="utf-8")
 
         # Should mention testing
         assert "test" in content.lower()
@@ -219,7 +219,7 @@ class TestExamplesPage:
         assert result.exit_code == 0
 
         examples_page = result.project_dir / "docs" / "pages" / "examples.md"
-        content = examples_page.read_text()
+        content = examples_page.read_text(encoding="utf-8")
 
         # Should reference examples or notebooks
         assert "example" in content.lower()
@@ -239,7 +239,7 @@ class TestMkdocsConfiguration:
         mkdocs_file = result.project_dir / "mkdocs.yml"
         assert mkdocs_file.is_file()
 
-        mkdocs_data = yaml.safe_load(mkdocs_file.read_text())
+        mkdocs_data = yaml.safe_load(mkdocs_file.read_text(encoding="utf-8"))
 
         # Required fields
         assert "site_name" in mkdocs_data
@@ -259,7 +259,7 @@ class TestMkdocsConfiguration:
         assert result.exit_code == 0
 
         mkdocs_file = result.project_dir / "mkdocs.yml"
-        content = mkdocs_file.read_text()
+        content = mkdocs_file.read_text(encoding="utf-8")
         mkdocs_data = yaml.safe_load(content)
 
         # Check site_name
@@ -280,7 +280,7 @@ class TestMkdocsConfiguration:
         assert result.exit_code == 0
 
         mkdocs_file = result.project_dir / "mkdocs.yml"
-        mkdocs_data = yaml.safe_load(mkdocs_file.read_text())
+        mkdocs_data = yaml.safe_load(mkdocs_file.read_text(encoding="utf-8"))
 
         nav = mkdocs_data.get("nav", [])
         assert len(nav) > 0
@@ -297,7 +297,7 @@ class TestMkdocsConfiguration:
         assert result.exit_code == 0
 
         mkdocs_file = result.project_dir / "mkdocs.yml"
-        mkdocs_data = yaml.safe_load(mkdocs_file.read_text())
+        mkdocs_data = yaml.safe_load(mkdocs_file.read_text(encoding="utf-8"))
 
         nav = mkdocs_data.get("nav", [])
         nav_str = str(nav).lower()
@@ -311,7 +311,7 @@ class TestMkdocsConfiguration:
         assert result.exit_code == 0
 
         mkdocs_file = result.project_dir / "mkdocs.yml"
-        mkdocs_data = yaml.safe_load(mkdocs_file.read_text())
+        mkdocs_data = yaml.safe_load(mkdocs_file.read_text(encoding="utf-8"))
 
         nav = mkdocs_data.get("nav", [])
         nav_str = str(nav).lower()
@@ -325,7 +325,7 @@ class TestMkdocsConfiguration:
         assert result.exit_code == 0
 
         mkdocs_file = result.project_dir / "mkdocs.yml"
-        mkdocs_data = yaml.safe_load(mkdocs_file.read_text())
+        mkdocs_data = yaml.safe_load(mkdocs_file.read_text(encoding="utf-8"))
 
         theme = mkdocs_data.get("theme", {})
         if isinstance(theme, dict):
@@ -339,7 +339,7 @@ class TestMkdocsConfiguration:
         assert result.exit_code == 0
 
         mkdocs_file = result.project_dir / "mkdocs.yml"
-        mkdocs_data = yaml.safe_load(mkdocs_file.read_text())
+        mkdocs_data = yaml.safe_load(mkdocs_file.read_text(encoding="utf-8"))
 
         assert "plugins" in mkdocs_data
         plugins = mkdocs_data["plugins"]
@@ -354,7 +354,7 @@ class TestMkdocsConfiguration:
         assert result.exit_code == 0
 
         mkdocs_file = result.project_dir / "mkdocs.yml"
-        mkdocs_data = yaml.safe_load(mkdocs_file.read_text())
+        mkdocs_data = yaml.safe_load(mkdocs_file.read_text(encoding="utf-8"))
 
         plugins = mkdocs_data.get("plugins", [])
         plugins_str = str(plugins).lower()
@@ -368,7 +368,7 @@ class TestMkdocsConfiguration:
         assert result.exit_code == 0
 
         mkdocs_file = result.project_dir / "mkdocs.yml"
-        mkdocs_data = yaml.safe_load(mkdocs_file.read_text())
+        mkdocs_data = yaml.safe_load(mkdocs_file.read_text(encoding="utf-8"))
 
         plugins = mkdocs_data.get("plugins", [])
         plugins_str = str(plugins).lower()
@@ -382,7 +382,7 @@ class TestMkdocsConfiguration:
         assert result.exit_code == 0
 
         mkdocs_file = result.project_dir / "mkdocs.yml"
-        mkdocs_data = yaml.safe_load(mkdocs_file.read_text())
+        mkdocs_data = yaml.safe_load(mkdocs_file.read_text(encoding="utf-8"))
 
         # Should have hooks section
         assert "hooks" in mkdocs_data
@@ -408,7 +408,7 @@ class TestDocumentationVariableSubstitution:
 
         for page in docs_pages:
             if page.exists():
-                content = page.read_text()
+                content = page.read_text(encoding="utf-8")
 
                 # Should not have template placeholders
                 assert "{{" not in content
@@ -427,7 +427,7 @@ class TestDocumentationVariableSubstitution:
 
         # Check mkdocs.yml
         mkdocs_file = result.project_dir / "mkdocs.yml"
-        content = mkdocs_file.read_text()
+        content = mkdocs_file.read_text(encoding="utf-8")
 
         assert "my-custom-org" in content
         assert "github.com/my-custom-org/my-project" in content
@@ -435,7 +435,7 @@ class TestDocumentationVariableSubstitution:
         # Check contributing page
         contributing = result.project_dir / "docs" / "pages" / "contributing.md"
         if contributing.exists():
-            contrib_content = contributing.read_text()
+            contrib_content = contributing.read_text(encoding="utf-8")
             # Should reference the correct repository
             assert "my-custom-org" in contrib_content or "my-project" in contrib_content
 

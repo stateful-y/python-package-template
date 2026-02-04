@@ -107,7 +107,7 @@ class TestVersionPropagation:
         changelog_path = result.project_dir / "CHANGELOG.md"
         assert changelog_path.is_file()
 
-        content = changelog_path.read_text()
+        content = changelog_path.read_text(encoding="utf-8")
         assert version in content, f"Version {version} not found in CHANGELOG.md"
 
     def test_pyproject_uses_dynamic_versioning(self, copie):
@@ -116,7 +116,7 @@ class TestVersionPropagation:
         assert result.exit_code == 0
 
         pyproject_path = result.project_dir / "pyproject.toml"
-        content = pyproject_path.read_text()
+        content = pyproject_path.read_text(encoding="utf-8")
 
         # Should use dynamic versioning, not hardcoded version
         assert 'dynamic = ["version"]' in content

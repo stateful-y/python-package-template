@@ -51,7 +51,7 @@ class TestTestsWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "tests.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Use string-based validation since GitHub Actions YAML has expressions
         # that cannot be parsed by standard YAML parsers
@@ -71,7 +71,7 @@ class TestTestsWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "tests.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should use uv action or install uv
         assert "astral-sh/setup-uv" in workflow_content or "uv" in workflow_content
@@ -85,7 +85,7 @@ class TestTestsWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "tests.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Use string-based validation since GitHub Actions YAML has expressions
         assert "strategy:" in workflow_content
@@ -98,7 +98,7 @@ class TestTestsWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "tests.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should have doctest job or step
         assert "doctest" in workflow_content.lower()
@@ -109,7 +109,7 @@ class TestTestsWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "tests.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should have examples job or run_examples
         assert "example" in workflow_content.lower()
@@ -120,7 +120,7 @@ class TestTestsWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "tests.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should NOT have examples-related content
         assert "run_examples" not in workflow_content and "run-examples" not in workflow_content
@@ -143,7 +143,7 @@ class TestPublishWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "publish-release.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Use string-based validation since GitHub Actions YAML has expressions
         # Modern workflow triggers on pull_request close (changelog PR merge)
@@ -157,7 +157,7 @@ class TestPublishWorkflow:
 
         # Building happens in changelog.yml workflow, not publish-release.yml
         workflow_path = result.project_dir / ".github" / "workflows" / "changelog.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should use uv for building
         assert "uv build" in workflow_content or "uv" in workflow_content
@@ -169,7 +169,7 @@ class TestPublishWorkflow:
 
         # PyPI publishing now happens in publish-release.yml workflow
         workflow_path = result.project_dir / ".github" / "workflows" / "publish-release.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should have pypi-publish job
         assert "pypi-publish" in workflow_content or "pypi" in workflow_content.lower()
@@ -188,7 +188,7 @@ class TestPublishWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "publish-release.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should create GitHub release
         assert "release" in workflow_content.lower()
@@ -199,7 +199,7 @@ class TestPublishWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "publish-release.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should have pypi-publish job with needs dependency
         assert "pypi-publish" in workflow_content or "pypi_publish" in workflow_content
@@ -232,7 +232,7 @@ class TestPublishWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "changelog.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should NOT have pypi-publish job (moved to publish-release.yml)
         assert "pypi-publish:" not in workflow_content
@@ -262,7 +262,7 @@ class TestChangelogWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "changelog.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should use git-cliff action
         assert "git-cliff" in workflow_content
@@ -276,7 +276,7 @@ class TestChangelogWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "changelog.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Use string-based validation since GitHub Actions YAML has expressions
         assert "on:" in workflow_content
@@ -301,7 +301,7 @@ class TestNightlyWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "nightly.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Use string-based validation since GitHub Actions YAML has expressions
         assert "on:" in workflow_content
@@ -314,7 +314,7 @@ class TestNightlyWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "nightly.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should use uv
         assert "uv" in workflow_content
@@ -337,7 +337,7 @@ class TestPRTitleWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "pr-title.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should validate conventional commit format
         assert "conventional" in workflow_content.lower() or "commitizen" in workflow_content.lower()
@@ -348,7 +348,7 @@ class TestPRTitleWorkflow:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "pr-title.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Use string-based validation since GitHub Actions YAML has expressions
         assert "on:" in workflow_content
@@ -376,7 +376,7 @@ class TestWorkflowConsistency:
         for workflow_file in workflow_files:
             workflow_path = workflows_dir / workflow_file
             if workflow_path.exists():
-                content = workflow_path.read_text()
+                content = workflow_path.read_text(encoding="utf-8")
 
                 # Track if it uses astral-sh/setup-uv action
                 uses_setup_uv_action = "astral-sh/setup-uv" in content
@@ -402,7 +402,7 @@ class TestWorkflowConsistency:
         for workflow_file in workflow_files:
             workflow_path = workflows_dir / workflow_file
             if workflow_path.exists():
-                content = workflow_path.read_text()
+                content = workflow_path.read_text(encoding="utf-8")
 
                 # Should install nox via uv tool
                 assert "uv tool install nox" in content or "uvx nox" in content, (
@@ -419,7 +419,7 @@ class TestWorkflowPermissions:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "publish-release.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Use string-based validation since GitHub Actions YAML has expressions
         # Should have permissions for PyPI trusted publishing and GitHub release
@@ -431,7 +431,7 @@ class TestWorkflowPermissions:
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "changelog.yml"
-        workflow_content = workflow_path.read_text()
+        workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Use string-based validation since GitHub Actions YAML has expressions
         # Should have permissions for writing to contents

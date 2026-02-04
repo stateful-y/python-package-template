@@ -35,11 +35,11 @@ class TestVersionOption:
         assert result.exit_code == 0
 
         # Version should be in CHANGELOG.md (initial version)
-        changelog_content = (result.project_dir / "CHANGELOG.md").read_text()
+        changelog_content = (result.project_dir / "CHANGELOG.md").read_text(encoding="utf-8")
         assert version in changelog_content, f"Version {version} not found in CHANGELOG.md"
 
         # pyproject.toml uses dynamic versioning (hatch-vcs), so version is NOT there
-        pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+        pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
         assert 'dynamic = ["version"]' in pyproject_content
 
 
@@ -53,19 +53,19 @@ class TestDescriptionOption:
         assert result.exit_code == 0
 
         # Check pyproject.toml
-        pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+        pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
         assert f'description = "{custom_description}"' in pyproject_content
 
         # Check README.md
-        readme_content = (result.project_dir / "README.md").read_text()
+        readme_content = (result.project_dir / "README.md").read_text(encoding="utf-8")
         assert custom_description in readme_content
 
         # Check mkdocs.yml
-        mkdocs_content = (result.project_dir / "mkdocs.yml").read_text()
+        mkdocs_content = (result.project_dir / "mkdocs.yml").read_text(encoding="utf-8")
         assert custom_description in mkdocs_content
 
         # Check docs/index.md
-        docs_index_content = (result.project_dir / "docs" / "index.md").read_text()
+        docs_index_content = (result.project_dir / "docs" / "index.md").read_text(encoding="utf-8")
         assert custom_description in docs_index_content
 
     def test_empty_description(self, copie):
@@ -75,7 +75,7 @@ class TestDescriptionOption:
 
         # Should not break generation
         assert (result.project_dir / "pyproject.toml").is_file()
-        pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+        pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
         assert 'description = ""' in pyproject_content
 
     def test_description_with_special_chars(self, copie):
@@ -85,7 +85,7 @@ class TestDescriptionOption:
         assert result.exit_code == 0
 
         # Description should be properly escaped in pyproject.toml
-        pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+        pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
         # Should contain the description (with proper escaping)
         assert "modern" in pyproject_content
         assert "tool" in pyproject_content
@@ -101,11 +101,11 @@ class TestAuthorOptions:
         assert result.exit_code == 0
 
         # Check pyproject.toml
-        pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+        pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
         assert custom_author in pyproject_content
 
         # Check LICENSE (MIT default)
-        license_content = (result.project_dir / "LICENSE").read_text()
+        license_content = (result.project_dir / "LICENSE").read_text(encoding="utf-8")
         assert custom_author in license_content
 
     def test_author_name_with_unicode(self, copie):
@@ -115,7 +115,7 @@ class TestAuthorOptions:
         assert result.exit_code == 0
 
         # Should work without issues
-        license_content = (result.project_dir / "LICENSE").read_text()
+        license_content = (result.project_dir / "LICENSE").read_text(encoding="utf-8")
         assert unicode_author in license_content
 
     def test_custom_author_email(self, copie):
@@ -125,7 +125,7 @@ class TestAuthorOptions:
         assert result.exit_code == 0
 
         # Check pyproject.toml
-        pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+        pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
         assert custom_email in pyproject_content
 
     def test_author_email_with_plus_sign(self, copie):
@@ -134,7 +134,7 @@ class TestAuthorOptions:
         result = copie.copy(extra_answers={"author_email": email_with_plus})
         assert result.exit_code == 0
 
-        pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+        pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
         assert email_with_plus in pyproject_content
 
 
@@ -155,17 +155,17 @@ class TestGithubUsernameOption:
         expected_repo_url = f"https://github.com/{custom_username}/test-project"
 
         # Check README.md
-        readme_content = (result.project_dir / "README.md").read_text()
+        readme_content = (result.project_dir / "README.md").read_text(encoding="utf-8")
         assert custom_username in readme_content
         assert expected_repo_url in readme_content
 
         # Check mkdocs.yml
-        mkdocs_content = (result.project_dir / "mkdocs.yml").read_text()
+        mkdocs_content = (result.project_dir / "mkdocs.yml").read_text(encoding="utf-8")
         assert f"repo_url: {expected_repo_url}" in mkdocs_content
         assert f"repo_name: {custom_username}/test-project" in mkdocs_content
 
         # Check pyproject.toml
-        pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+        pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
         # GitHub URLs might not be in pyproject.toml depending on template
         # Just verify project was created successfully
         assert "name = " in pyproject_content
@@ -254,7 +254,7 @@ class TestProjectNameDerivation:
             assert result.exit_code == 0
 
             # Check pyproject.toml name field
-            pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+            pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
             # Name should exist in pyproject.toml
             assert "name = " in pyproject_content
 
@@ -286,11 +286,11 @@ class TestProjectNameDerivation:
         assert result.exit_code == 0
 
         # pyproject.toml name field uses package_name, not project_slug
-        pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+        pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
         assert 'name = "custom_package"' in pyproject_content
 
         # But project_slug is used in URLs and GitHub links
-        readme_content = (result.project_dir / "README.md").read_text()
+        readme_content = (result.project_dir / "README.md").read_text(encoding="utf-8")
         assert "custom-slug" in readme_content
 
 
@@ -354,7 +354,7 @@ class TestOptionCombinations:
         assert result.exit_code == 0
 
         # Verify key propagations
-        pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+        pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
         # pyproject.toml name field uses package_name, not project_slug
         assert 'name = "custom_pkg"' in pyproject_content
         # Version is dynamic (hatch-vcs), not in pyproject.toml
@@ -367,11 +367,11 @@ class TestOptionCombinations:
         assert (result.project_dir / "src" / "custom_pkg").is_dir()
 
         # Verify GitHub username in README
-        readme_content = (result.project_dir / "README.md").read_text()
+        readme_content = (result.project_dir / "README.md").read_text(encoding="utf-8")
         assert "custom-org" in readme_content
 
         # Verify license
-        license_content = (result.project_dir / "LICENSE").read_text()
+        license_content = (result.project_dir / "LICENSE").read_text(encoding="utf-8")
         assert "Apache License" in license_content
         assert "Custom Author" in license_content
 

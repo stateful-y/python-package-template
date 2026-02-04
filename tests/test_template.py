@@ -83,7 +83,7 @@ def test_generated_pyproject_uses_correct_tools(copie):
     pyproject_path = result.project_dir / "pyproject.toml"
     assert pyproject_path.is_file()
 
-    content = pyproject_path.read_text()
+    content = pyproject_path.read_text(encoding="utf-8")
 
     # Check for required tools in dependency groups
     assert "ty" in content, "ty not found in pyproject.toml"
@@ -116,7 +116,7 @@ def test_generated_project_has_correct_license(copie):
     license_path = result.project_dir / "LICENSE"
     assert license_path.is_file()
 
-    content = license_path.read_text()
+    content = license_path.read_text(encoding="utf-8")
     assert "MIT" in content
 
 
@@ -127,7 +127,7 @@ def test_noxfile_configuration(copie):
     noxfile_path = result.project_dir / "noxfile.py"
     assert noxfile_path.is_file()
 
-    content = noxfile_path.read_text()
+    content = noxfile_path.read_text(encoding="utf-8")
 
     # Check for uv backend
     assert 'default_venv_backend = "uv|virtualenv"' in content
@@ -143,7 +143,7 @@ def test_precommit_configuration(copie):
     precommit_path = result.project_dir / ".pre-commit-config.yaml"
     assert precommit_path.is_file()
 
-    content = precommit_path.read_text()
+    content = precommit_path.read_text(encoding="utf-8")
 
     # Check for ruff
     assert "ruff-pre-commit" in content or "ruff" in content
@@ -162,7 +162,7 @@ def test_github_workflows(copie):
     tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
     assert tests_workflow.is_file()
 
-    content = tests_workflow.read_text()
+    content = tests_workflow.read_text(encoding="utf-8")
 
     # Check for uv usage
     assert "astral-sh/setup-uv" in content
@@ -178,7 +178,7 @@ def test_github_workflows(copie):
     pr_title_workflow = result.project_dir / ".github" / "workflows" / "pr-title.yml"
     assert pr_title_workflow.is_file(), "PR title validation workflow not found"
 
-    pr_title_content = pr_title_workflow.read_text()
+    pr_title_content = pr_title_workflow.read_text(encoding="utf-8")
     assert "amannn/action-semantic-pull-request" in pr_title_content
     assert "feat" in pr_title_content
     assert "fix" in pr_title_content
@@ -193,7 +193,7 @@ def test_release_workflow(copie):
     changelog_workflow = result.project_dir / ".github" / "workflows" / "changelog.yml"
     assert changelog_workflow.is_file()
 
-    changelog_content = changelog_workflow.read_text()
+    changelog_content = changelog_workflow.read_text(encoding="utf-8")
 
     # Check for git-cliff
     assert "git-cliff" in changelog_content, "git-cliff not found in changelog workflow"
@@ -205,7 +205,7 @@ def test_release_workflow(copie):
     release_workflow = result.project_dir / ".github" / "workflows" / "publish-release.yml"
     assert release_workflow.is_file()
 
-    release_content = release_workflow.read_text()
+    release_content = release_workflow.read_text(encoding="utf-8")
 
     # Check for GitHub release creation
     assert "gh release create" in release_content or "github-release" in release_content.lower(), (
@@ -220,7 +220,7 @@ def test_commitizen_configuration(copie):
     pyproject_path = result.project_dir / "pyproject.toml"
     assert pyproject_path.is_file()
 
-    content = pyproject_path.read_text()
+    content = pyproject_path.read_text(encoding="utf-8")
 
     # Check for commitizen configuration
     assert "[tool.commitizen]" in content, "commitizen config not found in pyproject.toml"
@@ -234,7 +234,7 @@ def test_git_cliff_configuration(copie):
     cliff_config = result.project_dir / ".git-cliff.toml"
     assert cliff_config.is_file()
 
-    content = cliff_config.read_text()
+    content = cliff_config.read_text(encoding="utf-8")
 
     # Check for conventional commits
     assert "conventional_commits" in content, "conventional commits not enabled in git-cliff"
@@ -276,23 +276,23 @@ def test_doctest_configuration(copie):
     assert result.project_dir.is_dir()
 
     # Check pyproject.toml contains doctest configuration
-    pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+    pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
     assert "[tool.pytest.ini_options.doctest]" in pyproject_content
     assert "--doctest-modules" in pyproject_content
     assert "--doctest-continue-on-failure" in pyproject_content
 
     # Check noxfile has doctest session
-    noxfile_content = (result.project_dir / "noxfile.py").read_text()
+    noxfile_content = (result.project_dir / "noxfile.py").read_text(encoding="utf-8")
     assert "def doctest(session:" in noxfile_content
     assert '"--doctest-modules"' in noxfile_content
 
     # Check justfile has doctest command
-    justfile_content = (result.project_dir / "justfile").read_text()
+    justfile_content = (result.project_dir / "justfile").read_text(encoding="utf-8")
     assert "doctest:" in justfile_content
     assert "--doctest-modules" in justfile_content
 
     # Check example.py has docstring examples
-    example_py = (result.project_dir / "src" / "test_project" / "example.py").read_text()
+    example_py = (result.project_dir / "src" / "test_project" / "example.py").read_text(encoding="utf-8")
     assert "Examples:" in example_py
     assert ">>>" in example_py
 
@@ -314,20 +314,20 @@ def test_examples_directory_when_enabled(copie):
     assert hello_notebook.is_file(), "examples/hello.py not created"
 
     # Check notebook content
-    notebook_content = hello_notebook.read_text()
+    notebook_content = hello_notebook.read_text(encoding="utf-8")
     assert "import marimo" in notebook_content
     assert "app = marimo.App" in notebook_content
     assert "plotly" in notebook_content
     assert "num_points" in notebook_content
 
     # Check marimo in dependencies
-    pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+    pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
     assert "marimo" in pyproject_content
     assert "plotly" in pyproject_content
     assert "mkdocs-marimo" in pyproject_content
 
     # Check noxfile has run_examples session (export is handled by hooks)
-    noxfile_content = (result.project_dir / "noxfile.py").read_text()
+    noxfile_content = (result.project_dir / "noxfile.py").read_text(encoding="utf-8")
     assert "def run_examples(session:" in noxfile_content
     assert "examples/hello.py" in noxfile_content
 
@@ -336,19 +336,19 @@ def test_examples_directory_when_enabled(copie):
     assert docs_examples_dir.is_dir(), "docs/examples/ directory not created"
 
     # Check justfile has example command
-    justfile_content = (result.project_dir / "justfile").read_text()
+    justfile_content = (result.project_dir / "justfile").read_text(encoding="utf-8")
     assert "example:" in justfile_content
     assert "marimo edit" in justfile_content
 
     # Check examples.md exists and mentions standalone notebooks
     examples_md = result.project_dir / "docs" / "pages" / "examples.md"
     assert examples_md.is_file(), "docs/pages/examples.md not created"
-    examples_content = examples_md.read_text()
+    examples_content = examples_md.read_text(encoding="utf-8")
     assert "Standalone HTML Notebooks" in examples_content
     assert "../examples/hello/" in examples_content
 
     # Check mkdocs.yml includes examples in nav and has exclude_docs
-    mkdocs_content = (result.project_dir / "mkdocs.yml").read_text()
+    mkdocs_content = (result.project_dir / "mkdocs.yml").read_text(encoding="utf-8")
     assert "Examples: pages/examples.md" in mkdocs_content
     # Check for multiline exclude_docs format
     assert "exclude_docs:" in mkdocs_content
@@ -357,17 +357,17 @@ def test_examples_directory_when_enabled(copie):
 
     # Check GitHub workflow includes examples job
     tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
-    workflow_content = tests_workflow.read_text()
+    workflow_content = tests_workflow.read_text(encoding="utf-8")
     assert "examples:" in workflow_content
     assert "nox -s run_examples" in workflow_content
 
     # Check README mentions examples (in "Where can I learn more?" section)
-    readme_content = (result.project_dir / "README.md").read_text()
+    readme_content = (result.project_dir / "README.md").read_text(encoding="utf-8")
     assert "Interactive Examples:" in readme_content or "examples/" in readme_content
     assert "marimo edit examples/hello.py" in readme_content
 
     # Check CONTRIBUTING mentions adding examples
-    contributing_content = (result.project_dir / "docs" / "pages" / "contributing.md").read_text()
+    contributing_content = (result.project_dir / "docs" / "pages" / "contributing.md").read_text(encoding="utf-8")
     assert "### Adding Examples" in contributing_content
     assert "export_examples" in contributing_content
 
@@ -387,7 +387,7 @@ def test_examples_directory_when_disabled(copie):
     assert not examples_dir.is_dir(), "examples/ directory created"
 
     # Marimo should not be in examples dependencies
-    pyproject_content = (result.project_dir / "pyproject.toml").read_text()
+    pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
     # examples group should not exist or be empty
     assert (
         "examples = [" not in pyproject_content
@@ -401,11 +401,11 @@ def test_examples_directory_when_disabled(copie):
     assert "mkdocs-marimo" not in pyproject_content
 
     # Check noxfile doesn't have run_examples session
-    noxfile_content = (result.project_dir / "noxfile.py").read_text()
+    noxfile_content = (result.project_dir / "noxfile.py").read_text(encoding="utf-8")
     assert "def run_examples(session:" not in noxfile_content
 
     # Check justfile doesn't have example command
-    justfile_content = (result.project_dir / "justfile").read_text()
+    justfile_content = (result.project_dir / "justfile").read_text(encoding="utf-8")
     # Should not have the example command, but might have other content
     lines = justfile_content.split("\n")
     example_command_lines = [line for line in lines if line.strip().startswith("example:")]
@@ -414,18 +414,18 @@ def test_examples_directory_when_disabled(copie):
     # Check examples.md doesn't exist or is empty
     examples_md = result.project_dir / "docs" / "examples.md"
     if examples_md.exists():
-        content = examples_md.read_text().strip()
+        content = examples_md.read_text(encoding="utf-8").strip()
         assert content == "", (
             f"docs/examples.md should be empty when examples are disabled, but contains: {content[:100]}"
         )
 
     # Check mkdocs.yml doesn't include examples in nav
-    mkdocs_content = (result.project_dir / "mkdocs.yml").read_text()
+    mkdocs_content = (result.project_dir / "mkdocs.yml").read_text(encoding="utf-8")
     assert "Examples: examples.md" not in mkdocs_content
 
     # Check GitHub workflow doesn't include examples job
     tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
-    workflow_content = tests_workflow.read_text()
+    workflow_content = tests_workflow.read_text(encoding="utf-8")
     assert "run_examples" not in workflow_content
 
 
@@ -466,7 +466,7 @@ def test_github_actions_when_enabled(copie):
     assert (issue_template_dir / "config.yml").is_file(), "issue template config.yml not created"
 
     # Check workflow content uses uv
-    tests_workflow_content = (workflows_dir / "tests.yml").read_text()
+    tests_workflow_content = (workflows_dir / "tests.yml").read_text(encoding="utf-8")
     assert "astral-sh/setup-uv" in tests_workflow_content, "uv not used in tests workflow"
 
     # Check git-cliff.toml exists (should be included with workflows)
@@ -497,7 +497,7 @@ def test_github_actions_when_disabled(copie):
     # git-cliff.toml should not exist or be empty (only needed with workflows)
     git_cliff = result.project_dir / ".git-cliff.toml"
     if git_cliff.exists():
-        content = git_cliff.read_text().strip()
+        content = git_cliff.read_text(encoding="utf-8").strip()
         assert content == "", ".git-cliff.toml should be empty when GitHub Actions are disabled"
 
 
@@ -516,7 +516,7 @@ def test_markdown_docs_script_configuration(copie):
     assert hooks_file.is_file(), "docs/hooks.py not created"
 
     # Verify hooks.py has all required hooks
-    hooks_content = hooks_file.read_text()
+    hooks_content = hooks_file.read_text(encoding="utf-8")
     assert "on_pre_build" in hooks_content, "on_pre_build hook not found"
     assert "on_files" in hooks_content, "on_files hook not found"
     assert "on_post_build" in hooks_content, "on_post_build hook not found"
@@ -531,7 +531,7 @@ def test_markdown_docs_script_configuration(copie):
     assert "markdown" in hooks_content.lower(), "hooks.py doesn't handle markdown files"
 
     # Verify mkdocs.yml configures hooks
-    mkdocs_content = (result.project_dir / "mkdocs.yml").read_text()
+    mkdocs_content = (result.project_dir / "mkdocs.yml").read_text(encoding="utf-8")
     assert "hooks:" in mkdocs_content, "mkdocs.yml doesn't configure hooks"
     assert "docs/hooks.py" in mkdocs_content, "mkdocs.yml doesn't reference hooks.py"
 
@@ -578,7 +578,7 @@ def test_marimo_notebook_export_to_html(copie):
     )
 
     # Verify HTML content
-    html_content = hello_html.read_text()
+    html_content = hello_html.read_text(encoding="utf-8")
     assert len(html_content) > 1000, "HTML file is suspiciously small"
 
     # Check for marimo WASM runtime (key indicator of HTML-WASM export)
@@ -640,7 +640,7 @@ def test_markdown_docs_created_and_clean(copie):
 
     # Verify markdown files contain content and are clean (no HTML tags)
     for md_file in md_files:
-        content = md_file.read_text()
+        content = md_file.read_text(encoding="utf-8")
         assert len(content) > 0, f"{md_file} is empty"
 
         # Should not contain raw HTML tags from mkdocs-material
@@ -674,7 +674,7 @@ def test_three_tier_documentation_system(copie):
 
     # Tier 1: Verify embedded marimo setup in examples.md
     examples_md = result.project_dir / "docs" / "pages" / "examples.md"
-    examples_content = examples_md.read_text()
+    examples_content = examples_md.read_text(encoding="utf-8")
     # Check for either marimo embed directive or inline marimo code
     has_marimo = "marimo-embed-file" in examples_content or "```python {marimo}" in examples_content
     assert has_marimo, "Embedded marimo notebook not found in examples.md"
@@ -698,7 +698,7 @@ def test_three_tier_documentation_system(copie):
 
     # Verify mkdocs excludes standalone HTML from processing
     mkdocs_yml = result.project_dir / "mkdocs.yml"
-    mkdocs_content = mkdocs_yml.read_text()
+    mkdocs_content = mkdocs_yml.read_text(encoding="utf-8")
     assert "exclude_docs:" in mkdocs_content, "mkdocs.yml doesn't have exclude_docs"
     assert "examples/**/index.html" in mkdocs_content, "mkdocs.yml doesn't exclude standalone HTML files"
     assert "examples/**/CLAUDE.md" in mkdocs_content, "mkdocs.yml doesn't exclude CLAUDE.md files"
@@ -1000,7 +1000,7 @@ def test_generated_source_files_are_valid_python(copie):
     # Try to parse each Python file
     for py_file in python_files:
         try:
-            content = py_file.read_text()
+            content = py_file.read_text(encoding="utf-8")
             ast.parse(content)
         except SyntaxError as e:
             pytest.fail(f"Syntax error in {py_file.relative_to(result.project_dir)}: {e}")
@@ -1019,7 +1019,7 @@ def test_copier_answers_file_generated(copie):
     assert copier_answers.is_file(), ".copier-answers.yml not generated"
 
     # Verify it contains copier metadata (answers may not be included by default)
-    content = copier_answers.read_text()
+    content = copier_answers.read_text(encoding="utf-8")
     assert "_commit:" in content or "_src_path:" in content  # copier metadata
 
 
@@ -1050,7 +1050,7 @@ def test_copier_answers_stores_all_user_inputs(copie):
     copier_answers = result.project_dir / ".copier-answers.yml"
     assert copier_answers.is_file()
 
-    content = copier_answers.read_text()
+    content = copier_answers.read_text(encoding="utf-8")
 
     # Verify copier metadata is present
     assert "_commit:" in content, "Missing _commit in .copier-answers.yml"
@@ -1084,7 +1084,7 @@ def test_max_python_version_in_classifiers(copie):
     assert result.exit_code == 0
 
     pyproject_path = result.project_dir / "pyproject.toml"
-    content = pyproject_path.read_text()
+    content = pyproject_path.read_text(encoding="utf-8")
 
     # Should include 3.11, 3.12, 3.13
     assert '"Programming Language :: Python :: 3.11"' in content
@@ -1105,7 +1105,7 @@ def test_max_python_version_single_version(copie):
     assert result.exit_code == 0
 
     pyproject_path = result.project_dir / "pyproject.toml"
-    content = pyproject_path.read_text()
+    content = pyproject_path.read_text(encoding="utf-8")
 
     # Should only include 3.12
     assert '"Programming Language :: Python :: 3.12"' in content
@@ -1126,7 +1126,7 @@ def test_max_python_version_in_noxfile(copie):
     assert result.exit_code == 0
 
     noxfile_path = result.project_dir / "noxfile.py"
-    content = noxfile_path.read_text()
+    content = noxfile_path.read_text(encoding="utf-8")
 
     # Should have both MIN_VERSION and MAX_VERSION constants
     assert 'MIN_VERSION = "3.11"' in content
@@ -1147,7 +1147,7 @@ def test_max_python_version_in_github_workflows(copie):
     assert result.exit_code == 0
 
     tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
-    content = tests_workflow.read_text()
+    content = tests_workflow.read_text(encoding="utf-8")
 
     # Should include 3.12 and 3.13 in matrix
     assert '"3.12"' in content
@@ -1169,7 +1169,7 @@ def test_max_python_version_full_range(copie):
 
     # Check pyproject.toml classifiers
     pyproject_path = result.project_dir / "pyproject.toml"
-    pyproject_content = pyproject_path.read_text()
+    pyproject_content = pyproject_path.read_text(encoding="utf-8")
     assert '"Programming Language :: Python :: 3.11"' in pyproject_content
     assert '"Programming Language :: Python :: 3.12"' in pyproject_content
     assert '"Programming Language :: Python :: 3.13"' in pyproject_content
@@ -1177,13 +1177,13 @@ def test_max_python_version_full_range(copie):
 
     # Check noxfile
     noxfile_path = result.project_dir / "noxfile.py"
-    noxfile_content = noxfile_path.read_text()
+    noxfile_content = noxfile_path.read_text(encoding="utf-8")
     assert 'MIN_VERSION = "3.11"' in noxfile_content
     assert 'MAX_VERSION = "3.14"' in noxfile_content
 
     # Check GitHub workflow
     tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
-    workflow_content = tests_workflow.read_text()
+    workflow_content = tests_workflow.read_text(encoding="utf-8")
     assert '"3.11"' in workflow_content
     assert '"3.12"' in workflow_content
     assert '"3.13"' in workflow_content
@@ -1201,7 +1201,7 @@ def test_max_python_version_requires_python_unchanged(copie):
     assert result.exit_code == 0
 
     pyproject_path = result.project_dir / "pyproject.toml"
-    content = pyproject_path.read_text()
+    content = pyproject_path.read_text(encoding="utf-8")
 
     # requires-python should only use min_python_version
     assert 'requires-python = ">=3.12"' in content
