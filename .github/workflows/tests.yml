@@ -22,8 +22,7 @@ jobs:
       matrix:
         # Draft PRs: Ubuntu only, min+max Python versions (2 jobs)
         # Ready PRs: All OS, min+max Python versions (6 jobs)
-        # Temporarily forcing Windows for this PR to verify UTF-8 fix
-        os: ${{ github.event.pull_request.draft && fromJSON('["ubuntu-latest", "windows-latest"]') || fromJSON('["ubuntu-latest", "windows-latest", "macos-latest"]') }}
+        os: ${{ github.event.pull_request.draft && fromJSON('["ubuntu-latest"]') || fromJSON('["ubuntu-latest", "windows-latest", "macos-latest"]') }}
         python-version: ["3.11", "3.14"]
 
     steps:
