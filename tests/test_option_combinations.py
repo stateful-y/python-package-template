@@ -217,8 +217,9 @@ def test_readthedocs_config_consistency(copie):
     # Should use uv for installation
     assert "uv sync" in content
 
-    # Should build docs with mkdocs
-    assert "mkdocs build" in content
+    # Should configure mkdocs (RTD handles the build automatically)
+    assert "mkdocs:" in content
+    assert "configuration: mkdocs.yml" in content
 
 
 def test_justfile_commands_comprehensive(copie):
