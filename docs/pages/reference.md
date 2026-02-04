@@ -119,7 +119,7 @@ graph LR
 ```
 
 **Steps**:
-1. Developer pushes version tag (e.g., `git tag v0.2.0 && git push origin v0.2.0`)
+1. Developer pushes version tag (e.g., `git tag v0.2.0 -m "Release v0.2.0" && git push origin v0.2.0`)
 2. `changelog.yml` triggers, generates changelog, builds package, creates PR with changelog
 3. Developer reviews and merges the changelog PR
 4. `publish-release.yml` triggers on PR merge, creates GitHub Release with artifacts
