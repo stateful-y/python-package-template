@@ -55,7 +55,7 @@ jobs:
       - name: Create Pull Request for CHANGELOG
         uses: peter-evans/create-pull-request@v7
         with:
-          token: {% raw %}${{ secrets.RELEASE_AUTOMATION_TOKEN }}{% endraw %}
+          token: {% raw %}${{ secrets.CHANGELOG_AUTOMATION_TOKEN }}{% endraw %}
           add-paths: |
             CHANGELOG.md
           commit-message: "chore(release): update CHANGELOG.md for {% raw %}${{ steps.changelog.outputs.version }}{% endraw %}"
@@ -105,27 +105,3 @@ jobs:
         with:
           name: {% raw %}${{ env.dists-artifact-name }}{% endraw %}
           path: dist/*
-
-  pypi-publish:
-    name: upload release to PyPI
-    needs:
-      - build
-      - changelog
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/{{ package_name }}
-    permissions:
-      id-token: write
-    steps:
-      - name: Download all the dists
-        uses: actions/download-artifact@v4
-        with:
-          name: {% raw %}${{ env.dists-artifact-name }}{% endraw %}
-          path: dist/
-
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          attestations: true
-          verify-metadata: false

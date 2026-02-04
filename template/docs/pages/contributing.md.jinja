@@ -238,29 +238,66 @@ The pre-commit hook will validate your commit messages and prevent commits that 
 
 ## Release Process
 
-Releases are fully automated through GitHub Actions when a new tag is pushed.
+Releases are fully automated through GitHub Actions when a new tag is pushed, with a **manual approval gate** before publishing to PyPI to ensure quality control.
+
+```mermaid
+graph LR
+    A[Push Tag<br/>v*.*.*] --> B[changelog.yml]
+    B --> C[Generate<br/>CHANGELOG.md]
+    B --> D[Build Package]
+    C --> E[Create PR]
+    E --> F[Review & Merge<br/>PR]
+    F --> G[publish-release.yml]
+    G --> H[Create GitHub<br/>Release]
+    H --> I{Manual<br/>Approval}
+    I -->|Approve| J[Publish to PyPI]
+    style I fill:#ff9,stroke:#333,stroke-width:2px
+    style J fill:#9f9,stroke:#333,stroke-width:2px
+```
 
 ### Initial Setup (One-time)
 
-Before you can create releases, you need to set up a Personal Access Token:
+Before you can create releases, you need to configure two things:
+
+#### 1. Create a Personal Access Token for Changelog Automation
 
 1. **Create a Fine-grained Personal Access Token**:
    - Go to GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens
    - Click "Generate new token"
    - Configure:
-     - **Token name**: `RELEASE_AUTOMATION_TOKEN`
+     - **Token name**: `CHANGELOG_AUTOMATION_TOKEN`
      - **Expiration**: 90 days or longer
      - **Repository access**: Only select repositories → Choose this repository
      - **Permissions**:
        - Contents: Read and write
        - Pull requests: Read and write
-       - Workflows: Read and write
 
 2. **Add token as repository secret**:
    - Go to repository Settings → Secrets and variables → Actions
    - Click "New repository secret"
-   - Name: `RELEASE_AUTOMATION_TOKEN`
+   - Name: `CHANGELOG_AUTOMATION_TOKEN`
    - Value: Paste your generated token
+
+#### 2. Configure PyPI Environment with Required Reviewers
+
+To enable the manual approval gate before PyPI publishing:
+
+1. **Set up Trusted Publishing on PyPI** (if not already done):
+   - Go to your PyPI project → Manage → Publishing
+   - Add a new publisher with:
+     - **Owner**: Your GitHub username/org
+     - **Repository**: This repository name
+     - **Workflow**: `publish-release.yml`
+     - **Environment**: `pypi`
+
+2. **Configure environment protection in GitHub**:
+   - Go to repository Settings → Environments
+   - Click on the `pypi` environment (or create it if it doesn't exist)
+   - Enable "Required reviewers"
+   - Add yourself and/or other maintainers as required reviewers
+   - Optionally set a wait timer (e.g., 5 minutes) for additional safety
+
+This ensures that no package is published to PyPI without explicit approval from a maintainer.
 
 ### How It Works
 
@@ -270,14 +307,28 @@ Before you can create releases, you need to set up a Personal Access Token:
    git push origin v0.2.0
    ```
 
-2. **Automated workflow:**
+2. **Automated changelog workflow** (`changelog.yml`):
    - Generates changelog from conventional commits using git-cliff
    - Creates a **Pull Request** with the updated CHANGELOG.md
-   - Builds and publishes package to PyPI
-   - Creates GitHub Release with generated release notes
-   - Attaches distribution files to the release
+   - Builds the package distributions (wheels and sdist)
+   - Stores distributions as workflow artifacts
 
-3. **Release notes generation:**
+3. **Review and merge the changelog PR:**
+   - A maintainer reviews the generated changelog
+   - Once approved, merge the PR to main
+
+4. **Automated release workflow** (`publish-release.yml`):
+   - Creates a GitHub Release with generated release notes
+   - Attaches distribution files to the release
+   - **Waits for manual approval** before proceeding to PyPI
+
+5. **Manual approval for PyPI publishing:**
+   - Designated reviewers receive a notification
+   - Review the GitHub Release to verify everything is correct
+   - Approve the deployment to publish to PyPI
+   - Package is published using Trusted Publishing (OIDC, no tokens needed)
+
+6. **Release notes generation:**
    - All commits since the last tag are analyzed
    - Commits are grouped by type (Added, Fixed, Documentation, etc.)
    - Only commits following conventional format are included

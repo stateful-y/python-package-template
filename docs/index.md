@@ -13,7 +13,7 @@ A modern Python package template using [Copier](https://copier.readthedocs.io/) 
 - **Testing**: [pytest](https://pytest.org/) with coverage and docstring testing
 - **Documentation**: [MkDocs](https://www.mkdocs.org/) with Material theme and ReadTheDocs
 - **CI/CD**: GitHub Actions for testing, linting, releases, and coverage reporting
-- **Automated releases**: Tag-based workflow with changelog generation and PyPI publishing
+- **Automated releases**: Tag-based workflow with changelog generation, GitHub releases, and PyPI publishing with manual approval gate
 - **Pre-commit hooks**: Automated code quality checks on every commit
 - **Build system**: Modern PEP 517/518 with hatchling + hatch-vcs
 - **Task automation**: [nox](https://nox.thea.codes/) and [just](https://github.com/casey/just)

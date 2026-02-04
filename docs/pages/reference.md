@@ -101,27 +101,34 @@ my-package/
 
 ### Release Workflow
 
-The automated release process follows this flow:
+The automated release process follows this flow with a **manual approval gate** before PyPI publishing:
 
 ```mermaid
 graph LR
     A[Push Tag<br/>v*.*.*] --> B[changelog.yml]
     B --> C[Generate<br/>CHANGELOG.md]
     B --> D[Build Package]
-    D --> E[Publish to PyPI]
-    C --> F[Create PR]
-    F --> G[Review & Merge]
-    G --> H[publish-release.yml]
-    H --> I[Create GitHub<br/>Release]
+    C --> E[Create PR]
+    E --> F[Review & Merge<br/>PR]
+    F --> G[publish-release.yml]
+    G --> H[Create GitHub<br/>Release]
+    H --> I{Manual<br/>Approval}
+    I -->|Approve| J[Publish to PyPI]
+    style I fill:#ff9,stroke:#333,stroke-width:2px
+    style J fill:#9f9,stroke:#333,stroke-width:2px
 ```
 
 **Steps**:
 1. Developer pushes version tag (e.g., `git tag v0.2.0 && git push origin v0.2.0`)
-2. `changelog.yml` triggers, generates changelog, builds package, publishes to PyPI, creates PR
+2. `changelog.yml` triggers, generates changelog, builds package, creates PR with changelog
 3. Developer reviews and merges the changelog PR
 4. `publish-release.yml` triggers on PR merge, creates GitHub Release with artifacts
+5. **Manual approval required** - designated reviewers approve PyPI deployment
+6. Package is published to PyPI using Trusted Publishing (OIDC)
 
-**Required secrets**: `PYPI_API_TOKEN`, `RELEASE_AUTOMATION_TOKEN`, `CODECOV_TOKEN`
+**Required secrets**: `CHANGELOG_AUTOMATION_TOKEN`, `CODECOV_TOKEN`
+
+**Required environment protection**: `pypi` environment with required reviewers configured
 
 ### tests.yml - Continuous Integration
 
@@ -140,17 +147,17 @@ Runs on pull requests to main:
 - Ensures consistency with changelog generation (git-cliff)
 - Helps maintain clean commit history
 
-### changelog.yml - Automated Changelog
+### changelog.yml - Automated Changelog and Build
 
 Triggers on version tags (`v*.*.*`):
 - Generates changelog from conventional commits using git-cliff
 - Creates a **Pull Request** with updated `CHANGELOG.md`
 - Runs pre-commit hooks on generated changelog
 - Builds and validates package distributions
-- Publishes to PyPI automatically (requires trusted publishing or `PYPI_API_TOKEN` secret)
-- **Requires** `RELEASE_AUTOMATION_TOKEN` secret for PR creation
+- Stores distributions as workflow artifacts for later use
+- **Requires** `CHANGELOG_AUTOMATION_TOKEN` secret for PR creation
 
-### publish-release.yml - Automated GitHub Releases
+### publish-release.yml - GitHub Releases and PyPI Publishing
 
 Triggers when changelog PR is merged:
 - Detects merged PRs with the `changelog` label
@@ -160,8 +167,12 @@ Triggers when changelog PR is merged:
   - Release notes extracted from `CHANGELOG.md`
   - Package distributions attached (wheel + sdist)
   - Automatic tagging
+- **Publishes to PyPI with manual approval**:
+  - Waits for designated reviewers to approve deployment
+  - Uses Trusted Publishing (OIDC) for secure authentication
+  - Requires `pypi` environment with required reviewers configured
 
-**Complete release flow**: Tag push → Changelog PR → PyPI publish → Merge PR → GitHub Release
+**Complete release flow**: Tag push → Changelog + Build → PR creation → Review & Merge → GitHub Release → **Manual Approval** → PyPI publish
 
 ### nightly.yml - Proactive Monitoring
 

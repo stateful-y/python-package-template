@@ -83,35 +83,45 @@ git push -u origin main
 
 ### PyPI Publishing (Automated Releases)
 
-**Required secrets** (both needed for automated releases):
+**Required setup** (for automated releases):
 
-1. **PyPI API Token**:
+1. **PyPI Trusted Publishing** (OIDC, no tokens needed):
    - Create account at [pypi.org](https://pypi.org/account/register/)
-   - Go to Account settings → API tokens → Add API token
-   - Token name: `my-package`, Scope: Entire account
-   - Copy the token (starts with `pypi-`)
-   - In GitHub: Settings → Secrets and variables → Actions → New secret
-   - Add `PYPI_API_TOKEN` with your token
+   - Publish your first release manually, or create the project on PyPI
+   - Go to your project → Manage → Publishing
+   - Add a new publisher with:
+     - **Owner**: Your GitHub username/org
+     - **Repository**: Your repository name
+     - **Workflow**: `publish-release.yml`
+     - **Environment**: `pypi`
 
 2. **GitHub Personal Access Token** (for changelog PR creation):
    - Go to GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens
    - Click "Generate new token"
    - Configure:
-     - **Token name**: `RELEASE_AUTOMATION_TOKEN`
+     - **Token name**: `CHANGELOG_AUTOMATION_TOKEN`
      - **Expiration**: 90 days or longer
      - **Repository access**: Only select repositories → Choose your repository
-     - **Permissions**: Contents (Read/Write), Pull requests (Read/Write), Workflows (Read/Write)
+     - **Permissions**: Contents (Read/Write), Pull requests (Read/Write)
    - In repository Settings → Secrets and variables → Actions → New secret
-   - Add `RELEASE_AUTOMATION_TOKEN` with your token
+   - Add `CHANGELOG_AUTOMATION_TOKEN` with your token
+
+3. **Configure PyPI environment protection** (for manual approval):
+   - Go to repository Settings → Environments
+   - Click on `pypi` environment (or create it)
+   - Enable "Required reviewers" and add yourself as a reviewer
+   - This ensures PyPI releases require manual approval after GitHub Release creation
 
 Release your package by pushing a version tag:
 
 ```bash
-git tag v0.1.0
+git tag v0.1.0 -m "Release v0.1.0"
 git push origin v0.1.0
 ```
 
-This triggers: changelog generation → PyPI upload → GitHub release creation.
+This triggers: changelog generation → PR creation → (after merge) GitHub release → **manual approval** → PyPI publish.
+
+See the [Contributing Guide](../pages/contributing/) for detailed release process documentation.
 
 ### ReadTheDocs (Documentation)
 

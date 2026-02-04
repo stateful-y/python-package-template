@@ -163,16 +163,24 @@ class TestPublishWorkflow:
         assert "uv build" in workflow_content or "uv" in workflow_content
 
     def test_publish_workflow_has_pypi_upload(self, copie):
-        """Test that the build/publish workflow uploads to PyPI."""
+        """Test that publish workflow uploads to PyPI with manual approval."""
         result = copie.copy(extra_answers={"include_actions": True})
         assert result.exit_code == 0
 
-        # PyPI publishing happens in changelog.yml workflow
-        workflow_path = result.project_dir / ".github" / "workflows" / "changelog.yml"
+        # PyPI publishing now happens in publish-release.yml workflow
+        workflow_path = result.project_dir / ".github" / "workflows" / "publish-release.yml"
         workflow_content = workflow_path.read_text()
 
-        # Should use PyPI upload action or twine
-        assert "pypi" in workflow_content.lower()
+        # Should have pypi-publish job
+        assert "pypi-publish" in workflow_content or "pypi" in workflow_content.lower()
+
+        # Should use environment for manual approval
+        assert "environment:" in workflow_content
+        assert "name: pypi" in workflow_content
+
+        # Should use PyPI upload action with Trusted Publishing
+        assert "gh-action-pypi-publish" in workflow_content
+        assert "id-token: write" in workflow_content
 
     def test_publish_workflow_creates_github_release(self, copie):
         """Test that publish workflow creates GitHub release."""
@@ -184,6 +192,57 @@ class TestPublishWorkflow:
 
         # Should create GitHub release
         assert "release" in workflow_content.lower()
+
+    def test_publish_workflow_pypi_job_dependencies(self, copie):
+        """Test that pypi-publish job depends on create-release job."""
+        result = copie.copy(extra_answers={"include_actions": True})
+        assert result.exit_code == 0
+
+        workflow_path = result.project_dir / ".github" / "workflows" / "publish-release.yml"
+        workflow_content = workflow_path.read_text()
+
+        # Should have pypi-publish job with needs dependency
+        assert "pypi-publish" in workflow_content or "pypi_publish" in workflow_content
+
+        # Verify job dependency structure
+        lines = workflow_content.split("\n")
+        in_pypi_job = False
+        has_needs = False
+
+        for line in lines:
+            if "pypi-publish:" in line or "pypi_publish:" in line:
+                in_pypi_job = True
+            elif in_pypi_job and line.strip().startswith("needs:"):
+                has_needs = True
+            elif in_pypi_job and "create-release" in line:
+                # Found the dependency
+                assert has_needs or "needs:" in line, "pypi-publish should depend on create-release"
+                break
+            elif in_pypi_job and line.strip() and not line.startswith(" ") and not line.startswith("\t"):
+                # Started a new job, stop looking
+                break
+
+        # Verify environment is set for manual approval
+        assert "environment:" in workflow_content
+        assert "name: pypi" in workflow_content
+
+    def test_changelog_workflow_no_pypi_job(self, copie):
+        """Test that changelog workflow does not publish to PyPI."""
+        result = copie.copy(extra_answers={"include_actions": True})
+        assert result.exit_code == 0
+
+        workflow_path = result.project_dir / ".github" / "workflows" / "changelog.yml"
+        workflow_content = workflow_path.read_text()
+
+        # Should NOT have pypi-publish job (moved to publish-release.yml)
+        assert "pypi-publish:" not in workflow_content
+        assert "pypi_publish:" not in workflow_content
+
+        # But should still build packages
+        assert "uv build" in workflow_content or "build" in workflow_content.lower()
+
+        # Should store artifacts
+        assert "upload-artifact" in workflow_content
 
 
 class TestChangelogWorkflow:
@@ -207,6 +266,9 @@ class TestChangelogWorkflow:
 
         # Should use git-cliff action
         assert "git-cliff" in workflow_content
+
+        # Should use CHANGELOG_AUTOMATION_TOKEN
+        assert "CHANGELOG_AUTOMATION_TOKEN" in workflow_content
 
     def test_changelog_workflow_triggered_on_tags(self, copie):
         """Test that changelog workflow triggers on version tags."""

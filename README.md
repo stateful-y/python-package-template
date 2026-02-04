@@ -37,7 +37,7 @@ uv run pytest
 - Documentation with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/)
 - Task automation with [nox](https://nox.thea.codes/) and [just](https://github.com/casey/just)
 - CI/CD with [GitHub Actions](https://github.com/features/actions)
-- Automated tag-based releases with [git-cliff](https://git-cliff.org/) changelog generation, automatic PyPI publishing, and GitHub release creation via changelog PR workflow
+- Automated tag-based releases with [git-cliff](https://git-cliff.org/) changelog generation, GitHub release creation, and PyPI publishing with manual approval gate
 - Pre-commit hooks for code quality
 - Modern PEP 517/518 build with [hatchling](https://hatch.pypa.io/latest/)
 

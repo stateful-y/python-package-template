@@ -112,29 +112,66 @@ The pre-commit hook will validate your commit messages automatically.
 
 ## Release Process
 
-Releases are automated via GitHub Actions. Here's how it works:
+Releases are automated via GitHub Actions with a **manual approval gate** before PyPI publishing to ensure quality control.
+
+```mermaid
+graph LR
+    A[Push Tag<br/>v*.*.*] --> B[changelog.yml]
+    B --> C[Generate<br/>CHANGELOG.md]
+    B --> D[Build Package]
+    C --> E[Create PR]
+    E --> F[Review & Merge<br/>PR]
+    F --> G[publish-release.yml]
+    G --> H[Create GitHub<br/>Release]
+    H --> I{Manual<br/>Approval}
+    I -->|Approve| J[Publish to PyPI]
+    style I fill:#ff9,stroke:#333,stroke-width:2px
+    style J fill:#9f9,stroke:#333,stroke-width:2px
+```
 
 ### Initial Setup (One-time)
 
-Before you can create releases, you need to set up a Personal Access Token:
+Before you can create releases, you need to configure two things:
+
+#### 1. Create a Personal Access Token for Changelog Automation
 
 1. **Create a Fine-grained Personal Access Token**:
    - Go to GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens
    - Click "Generate new token"
    - Configure:
-     - **Token name**: `RELEASE_AUTOMATION_TOKEN`
+     - **Token name**: `CHANGELOG_AUTOMATION_TOKEN`
      - **Expiration**: 90 days or longer
      - **Repository access**: Only select repositories → Choose this repository
      - **Permissions**:
        - Contents: Read and write
        - Pull requests: Read and write
-       - Workflows: Read and write
 
 2. **Add token as repository secret**:
    - Go to repository Settings → Secrets and variables → Actions
    - Click "New repository secret"
-   - Name: `RELEASE_AUTOMATION_TOKEN`
+   - Name: `CHANGELOG_AUTOMATION_TOKEN`
    - Value: Paste your generated token
+
+#### 2. Configure PyPI Environment with Required Reviewers
+
+To enable the manual approval gate before PyPI publishing:
+
+1. **Set up Trusted Publishing on PyPI** (if not already done):
+   - Go to your PyPI project → Manage → Publishing
+   - Add a new publisher with:
+     - **Owner**: stateful-y
+     - **Repository**: python-package-copier
+     - **Workflow**: `publish-release.yml`
+     - **Environment**: `pypi`
+
+2. **Configure environment protection in GitHub**:
+   - Go to repository Settings → Environments
+   - Click on the `pypi` environment (or create it if it doesn't exist)
+   - Enable "Required reviewers"
+   - Add maintainers as required reviewers
+   - Optionally set a wait timer for additional safety
+
+This ensures that no package is published to PyPI without explicit approval from a maintainer.
 
 ### Creating a Release
 
@@ -146,14 +183,27 @@ Before you can create releases, you need to set up a Personal Access Token:
    git push origin v0.2.0
    ```
 
-3. **GitHub Actions automatically**:
+3. **Automated changelog workflow** (`changelog.yml`):
    - Generates the changelog using [git-cliff](https://git-cliff.org/)
    - Creates a **Pull Request** with the updated `CHANGELOG.md`
-   - Creates a GitHub Release with auto-generated release notes
+   - Builds the package distributions (wheels and sdist)
+   - Stores distributions as workflow artifacts
 
-4. **Manual step**:
-   - Review and merge the CHANGELOG PR to update the main branch
+4. **Review and merge the changelog PR**:
+   - Review the generated changelog
+   - Merge the PR to update the main branch
    - The PR is automatically labeled with `changelog` and `automated`
+
+5. **Automated release workflow** (`publish-release.yml`):
+   - Creates a GitHub Release with auto-generated release notes
+   - Attaches distribution files to the release
+   - **Waits for manual approval** before proceeding to PyPI
+
+6. **Manual approval for PyPI publishing**:
+   - Designated reviewers receive a notification
+   - Review the GitHub Release to verify everything is correct
+   - Approve the deployment to publish to PyPI
+   - Package is published using Trusted Publishing (OIDC, no tokens needed)
 
 ### Version Numbering
 

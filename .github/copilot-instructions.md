@@ -188,7 +188,7 @@ The template repository itself has GitHub Actions workflows:
   - `test-integration`: Runs integration/slow tests on Python 3.11 & 3.14 only, triggered on main branch, non-draft PRs, or manual dispatch
   - `test-full`: Runs complete test suite with coverage on main branch only
 - **`changelog.yml`**: Updates CHANGELOG.md via git-cliff when version tags are pushed
-- **`publish-release.yml`**: Publishes to PyPI and creates GitHub releases on tag push
+- **`publish-release.yml`**: Creates GitHub releases when changelog PR is merged (template repo does not publish to PyPI)
 - **`pr-title.yml`**: Validates PR titles follow conventional commit format
 
 **Test execution strategy**: Fast unit tests provide quick feedback on PRs (<5 min), while comprehensive integration tests validate generated projects work end-to-end (run on main or manually).
@@ -196,8 +196,8 @@ The template repository itself has GitHub Actions workflows:
 ### GitHub Actions
 Generated projects include workflows (if `include_actions: true`):
 - `tests.yml`: Run nox tests on push/PR with matrix strategy across Python versions
-- `publish-release.yml`: Build and publish to PyPI, create GitHub release on tag push
-- `changelog.yml`: Automated changelog generation with git-cliff on version tags
+- `changelog.yml`: Automated changelog generation with git-cliff on version tags, builds package distributions
+- `publish-release.yml`: Creates GitHub release when changelog PR is merged, then publishes to PyPI with manual approval gate
 - `nightly.yml`: Scheduled dependency testing against latest package versions
 - `pr-title.yml`: Validate PR titles follow conventional commit format
 - `dependabot.yml`: Automated dependency updates
@@ -205,12 +205,13 @@ Generated projects include workflows (if `include_actions: true`):
 All workflows use `uv tool install nox` to install nox in CI (not as a project dependency).
 
 ### Changelog & Versioning
-Generated projects use automated changelog and version management:
+Generated projects use automated changelog and version management with a manual approval gate for PyPI releases:
 - **git-cliff**: Generates changelogs from conventional commits (config in `.git-cliff.toml.jinja`)
 - **commitizen**: Enforces conventional commit messages via pre-commit hook
 - **hatch-vcs**: VCS-based versioning (reads from git tags, writes to `_version.py`)
 - Changelog format follows "Keep a Changelog" style
-- On tag push, `changelog.yml` workflow auto-generates CHANGELOG.md
+- On tag push, `changelog.yml` workflow auto-generates CHANGELOG.md and builds distributions
+- After changelog PR merge, `publish-release.yml` creates GitHub Release, then requires manual approval before PyPI publish
 
 Example commit format: `feat: add new feature` or `fix: resolve bug`
 
