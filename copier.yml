@@ -81,6 +81,17 @@ min_python_version:
     - "3.13"
     - "3.14"
 
+max_python_version:
+  type: str
+  help: "Maximum Python version"
+  default: "3.14"
+  choices:
+    - "3.11"
+    - "3.12"
+    - "3.13"
+    - "3.14"
+  validator: "{% if max_python_version < min_python_version %}Maximum Python version must be >= minimum Python version (min: {{ min_python_version }}, max: {{ max_python_version }}){% endif %}"
+
 include_actions:
   type: bool
   help: "Include GitHub Actions CI/CD workflows?"

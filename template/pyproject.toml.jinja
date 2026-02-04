@@ -15,11 +15,17 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: {{ min_python_version }}",
+{%- set versions = ["3.11", "3.12", "3.13", "3.14"] %}
+{%- for v in versions if v >= min_python_version and v <= max_python_version %}
+    "Programming Language :: Python :: {{ v }}",
+{%- endfor %}
 ]
 dependencies = [
 
 ]
+
+[project.scripts]
+pytest = "pytest:console_main"
 
 [dependency-groups]
 dev = [

@@ -28,6 +28,7 @@ class CopierTestFixture:
             "github_username": "testuser",
             "version": "0.1.0",
             "min_python_version": "3.11",
+            "max_python_version": "3.14",
             "license": "MIT",
             "include_actions": True,
             "include_examples": True,

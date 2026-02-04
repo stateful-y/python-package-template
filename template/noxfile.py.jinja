@@ -11,10 +11,11 @@ nox.options.default_venv_backend = "uv|virtualenv"
 # Default sessions to run when nox is called without arguments
 nox.options.sessions = ["fix", "tests_coverage", "serve_docs"]
 
-# Generate list of Python versions from minimum to 3.14
+# Generate list of Python versions from minimum to maximum
 ALL_VERSIONS = ["3.11", "3.12", "3.13", "3.14"]
 MIN_VERSION = "{{ min_python_version }}"
-PYTHON_VERSIONS = [v for v in ALL_VERSIONS if v >= MIN_VERSION]
+MAX_VERSION = "{{ max_python_version }}"
+PYTHON_VERSIONS = [v for v in ALL_VERSIONS if v >= MIN_VERSION and v <= MAX_VERSION]
 
 
 @nox.session(python=PYTHON_VERSIONS[0], venv_backend="uv")

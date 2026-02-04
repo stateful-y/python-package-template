@@ -1021,3 +1021,216 @@ def test_copier_answers_file_generated(copie):
     # Verify it contains copier metadata (answers may not be included by default)
     content = copier_answers.read_text()
     assert "_commit:" in content or "_src_path:" in content  # copier metadata
+
+
+def test_copier_answers_stores_all_user_inputs(copie):
+    """Test that .copier-answers.yml stores all user answers for template updates.
+
+    This is essential for 'copier update' to work correctly.
+    """
+    custom_answers = {
+        "project_name": "My Test Package",
+        "package_name": "my_test_pkg",
+        "project_slug": "my-test-package",
+        "description": "A custom test description",
+        "author_name": "Jane Developer",
+        "author_email": "jane@example.com",
+        "github_username": "janedev",
+        "version": "0.2.0",
+        "min_python_version": "3.12",
+        "max_python_version": "3.13",
+        "license": "Apache-2.0",
+        "include_actions": False,
+        "include_examples": False,
+    }
+
+    result = copie.copy(extra_answers=custom_answers)
+    assert result.exit_code == 0
+
+    copier_answers = result.project_dir / ".copier-answers.yml"
+    assert copier_answers.is_file()
+
+    content = copier_answers.read_text()
+
+    # Verify copier metadata is present
+    assert "_commit:" in content, "Missing _commit in .copier-answers.yml"
+    assert "_src_path:" in content, "Missing _src_path in .copier-answers.yml"
+    assert "gh:stateful-y/python-package-template" in content
+
+    # Verify all user answers are stored
+    assert "author_email: jane@example.com" in content
+    assert "author_name: Jane Developer" in content
+    assert "description: A custom test description" in content
+    assert "github_username: janedev" in content
+    assert "include_actions: false" in content or "include_actions: False" in content
+    assert "include_examples: false" in content or "include_examples: False" in content
+    assert "license: Apache-2.0" in content
+    assert "max_python_version: '3.13'" in content or "max_python_version: 3.13" in content
+    assert "min_python_version: '3.12'" in content or "min_python_version: 3.12" in content
+    assert "package_name: my_test_pkg" in content
+    assert "project_name: My Test Package" in content
+    assert "project_slug: my-test-package" in content
+    assert "version: 0.2.0" in content
+
+
+def test_max_python_version_in_classifiers(copie):
+    """Test that pyproject.toml classifiers include all Python versions from min to max."""
+    result = copie.copy(
+        extra_answers={
+            "min_python_version": "3.11",
+            "max_python_version": "3.13",
+        },
+    )
+    assert result.exit_code == 0
+
+    pyproject_path = result.project_dir / "pyproject.toml"
+    content = pyproject_path.read_text()
+
+    # Should include 3.11, 3.12, 3.13
+    assert '"Programming Language :: Python :: 3.11"' in content
+    assert '"Programming Language :: Python :: 3.12"' in content
+    assert '"Programming Language :: Python :: 3.13"' in content
+    # Should NOT include 3.14
+    assert '"Programming Language :: Python :: 3.14"' not in content
+
+
+def test_max_python_version_single_version(copie):
+    """Test that when min equals max, only one version classifier is included."""
+    result = copie.copy(
+        extra_answers={
+            "min_python_version": "3.12",
+            "max_python_version": "3.12",
+        },
+    )
+    assert result.exit_code == 0
+
+    pyproject_path = result.project_dir / "pyproject.toml"
+    content = pyproject_path.read_text()
+
+    # Should only include 3.12
+    assert '"Programming Language :: Python :: 3.12"' in content
+    # Should NOT include others
+    assert '"Programming Language :: Python :: 3.11"' not in content
+    assert '"Programming Language :: Python :: 3.13"' not in content
+    assert '"Programming Language :: Python :: 3.14"' not in content
+
+
+def test_max_python_version_in_noxfile(copie):
+    """Test that noxfile uses max_python_version to limit Python versions."""
+    result = copie.copy(
+        extra_answers={
+            "min_python_version": "3.11",
+            "max_python_version": "3.12",
+        },
+    )
+    assert result.exit_code == 0
+
+    noxfile_path = result.project_dir / "noxfile.py"
+    content = noxfile_path.read_text()
+
+    # Should have both MIN_VERSION and MAX_VERSION constants
+    assert 'MIN_VERSION = "3.11"' in content
+    assert 'MAX_VERSION = "3.12"' in content
+    # Should filter versions with both min and max
+    assert "v >= MIN_VERSION and v <= MAX_VERSION" in content
+
+
+def test_max_python_version_in_github_workflows(copie):
+    """Test that GitHub workflow matrix uses max_python_version."""
+    result = copie.copy(
+        extra_answers={
+            "min_python_version": "3.12",
+            "max_python_version": "3.13",
+            "include_actions": True,
+        },
+    )
+    assert result.exit_code == 0
+
+    tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
+    content = tests_workflow.read_text()
+
+    # Should include 3.12 and 3.13 in matrix
+    assert '"3.12"' in content
+    assert '"3.13"' in content
+    # Should NOT include 3.11 or 3.14
+    assert '"3.11"' not in content
+    assert '"3.14"' not in content
+
+
+def test_max_python_version_full_range(copie):
+    """Test max_python_version with full range 3.11-3.14."""
+    result = copie.copy(
+        extra_answers={
+            "min_python_version": "3.11",
+            "max_python_version": "3.14",
+        },
+    )
+    assert result.exit_code == 0
+
+    # Check pyproject.toml classifiers
+    pyproject_path = result.project_dir / "pyproject.toml"
+    pyproject_content = pyproject_path.read_text()
+    assert '"Programming Language :: Python :: 3.11"' in pyproject_content
+    assert '"Programming Language :: Python :: 3.12"' in pyproject_content
+    assert '"Programming Language :: Python :: 3.13"' in pyproject_content
+    assert '"Programming Language :: Python :: 3.14"' in pyproject_content
+
+    # Check noxfile
+    noxfile_path = result.project_dir / "noxfile.py"
+    noxfile_content = noxfile_path.read_text()
+    assert 'MIN_VERSION = "3.11"' in noxfile_content
+    assert 'MAX_VERSION = "3.14"' in noxfile_content
+
+    # Check GitHub workflow
+    tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
+    workflow_content = tests_workflow.read_text()
+    assert '"3.11"' in workflow_content
+    assert '"3.12"' in workflow_content
+    assert '"3.13"' in workflow_content
+    assert '"3.14"' in workflow_content
+
+
+def test_max_python_version_requires_python_unchanged(copie):
+    """Test that max_python_version doesn't affect requires-python (only min matters)."""
+    result = copie.copy(
+        extra_answers={
+            "min_python_version": "3.12",
+            "max_python_version": "3.13",
+        },
+    )
+    assert result.exit_code == 0
+
+    pyproject_path = result.project_dir / "pyproject.toml"
+    content = pyproject_path.read_text()
+
+    # requires-python should only use min_python_version
+    assert 'requires-python = ">=3.12"' in content
+    # Should NOT mention max version in requires-python
+    assert "<=3.13" not in content
+
+
+def test_max_python_version_validation_fails_when_less_than_min(copie):
+    """Test that copier validation fails when max_python_version < min_python_version."""
+    import pytest
+
+    with pytest.raises(ValueError, match="Validation error.*max_python_version.*Maximum Python version must be"):
+        copie.copy(
+            extra_answers={
+                "min_python_version": "3.13",
+                "max_python_version": "3.11",  # Invalid: less than min
+            },
+        )
+
+
+def test_max_python_version_validation_passes_when_equal_to_min(copie):
+    """Test that validation passes when max_python_version equals min_python_version."""
+    result = copie.copy(
+        extra_answers={
+            "min_python_version": "3.12",
+            "max_python_version": "3.12",  # Valid: equal to min
+        },
+    )
+
+    # Should succeed
+    assert result.exit_code == 0
+    assert result.exception is None

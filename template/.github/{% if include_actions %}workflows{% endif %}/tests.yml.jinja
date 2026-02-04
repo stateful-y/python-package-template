@@ -20,7 +20,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: [{%- set versions = ["3.11", "3.12", "3.13", "3.14"] -%}
-          {%- for v in versions if v >= min_python_version -%}
+          {%- for v in versions if v >= min_python_version and v <= max_python_version -%}
             "{{ v }}"{{ ", " if not loop.last else "" }}
           {%- endfor -%}]
 
