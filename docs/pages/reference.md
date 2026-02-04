@@ -27,7 +27,7 @@
 
 ## Template Variables
 
-When creating a new project with `uvx copier copy gh:stateful-y/python-package-template my-package`, you'll be prompted for these variables:
+When creating a new project with `uvx copier copy gh:stateful-y/python-package-copier my-package`, you'll be prompted for these variables:
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
@@ -231,7 +231,7 @@ Run this from your project's root directory.
 ### What Gets Updated
 
 Copier will:
-1. Pull the latest template changes from `gh:stateful-y/python-package-template`
+1. Pull the latest template changes from `gh:stateful-y/python-package-copier`
 2. Show you a diff of changes
 3. Prompt for any new configuration questions
 4. Apply updates while preserving your modifications

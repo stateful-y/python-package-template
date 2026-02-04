@@ -19,6 +19,8 @@ build:
     install:
       # Sync doc-dependencies (the group “docs”), then install the project itself
       - UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv sync --group docs
+    build:
+      # Build docs
+      - UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv run mkdocs build --clean
 
-mkdocs:
-  configuration: mkdocs.yml
+site_dir: site

@@ -1055,7 +1055,7 @@ def test_copier_answers_stores_all_user_inputs(copie):
     # Verify copier metadata is present
     assert "_commit:" in content, "Missing _commit in .copier-answers.yml"
     assert "_src_path:" in content, "Missing _src_path in .copier-answers.yml"
-    assert "gh:stateful-y/python-package-template" in content
+    assert "gh:stateful-y/python-package-copier" in content
 
     # Verify all user answers are stored
     assert "author_email: jane@example.com" in content

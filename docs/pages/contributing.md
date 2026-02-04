@@ -4,8 +4,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/stateful-y/python-package-template.git
-cd python-package-template
+git clone https://github.com/stateful-y/python-package-copier.git
+cd python-package-copier
 
 # Install dependencies
 uv sync --group test --group docs

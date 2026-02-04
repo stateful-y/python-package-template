@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "python-package-template"
+name = "python-package-copier"
 dynamic = ["version"]
 description = "A modern Python package template using copier"
 readme = "README.md"

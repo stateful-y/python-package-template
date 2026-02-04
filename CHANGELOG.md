@@ -12,14 +12,14 @@ This **minor release** includes 4 commits.
 
 
 ### Features
-- Include logos across docs and README  ([#44](https://github.com/stateful-y/python-package-template/pull/44)) by @gtauzin
-- Transform template docs to a user-focused structure  ([#46](https://github.com/stateful-y/python-package-template/pull/46)) by @gtauzin
+- Include logos across docs and README  ([#44](https://github.com/stateful-y/python-package-copier/pull/44)) by @gtauzin
+- Transform template docs to a user-focused structure  ([#46](https://github.com/stateful-y/python-package-copier/pull/46)) by @gtauzin
 
 ### Documentation
-- Update documentation assets and add README  ([#48](https://github.com/stateful-y/python-package-template/pull/48)) by @gtauzin
+- Update documentation assets and add README  ([#48](https://github.com/stateful-y/python-package-copier/pull/48)) by @gtauzin
 
 ### Refactoring
-- Restructure test suite and improve marimo/MkDocs integration  ([#45](https://github.com/stateful-y/python-package-template/pull/45)) by @gtauzin
+- Restructure test suite and improve marimo/MkDocs integration  ([#45](https://github.com/stateful-y/python-package-copier/pull/45)) by @gtauzin
 
 ### Contributors
 
@@ -49,15 +49,15 @@ This **minor release** includes 4 commits.
 
 
 ### Features
-- Add docstring testing support and restructure documentation  ([#37](https://github.com/gtauzin/python-package-template/pull/37)) by @gtauzin
-- Add optional marimo notebook examples  ([#38](https://github.com/gtauzin/python-package-template/pull/38)) by @gtauzin
+- Add docstring testing support and restructure documentation  ([#37](https://github.com/gtauzin/python-package-copier/pull/37)) by @gtauzin
+- Add optional marimo notebook examples  ([#38](https://github.com/gtauzin/python-package-copier/pull/38)) by @gtauzin
 
 ### Bug Fixes
-- Improve release notes extraction from CHANGELOG.md  ([#35](https://github.com/gtauzin/python-package-template/pull/35)) by @gtauzin
-- Correct copier source path and add update documentation  ([#36](https://github.com/gtauzin/python-package-template/pull/36)) by @gtauzin
+- Improve release notes extraction from CHANGELOG.md  ([#35](https://github.com/gtauzin/python-package-copier/pull/35)) by @gtauzin
+- Correct copier source path and add update documentation  ([#36](https://github.com/gtauzin/python-package-copier/pull/36)) by @gtauzin
 
 ### Refactoring
-- Rename `include_github_actions` into `include_actions` and `python_version` into `min_python_version`  ([#38](https://github.com/gtauzin/python-package-template/pull/38)) by @gtauzin
+- Rename `include_github_actions` into `include_actions` and `python_version` into `min_python_version`  ([#38](https://github.com/gtauzin/python-package-copier/pull/38)) by @gtauzin
 
 ### Contributors
 
@@ -70,17 +70,17 @@ This **minor release** includes 7 commits.
 
 
 ### Features
-- Add dependency groups for dev, checks, and examples  ([#28](https://github.com/gtauzin/python-package-template/pull/28)) by @gtauzin
-- Add PR title validation and improve git-cliff configuration  ([#33](https://github.com/gtauzin/python-package-template/pull/33)) by @gtauzin
+- Add dependency groups for dev, checks, and examples  ([#28](https://github.com/gtauzin/python-package-copier/pull/28)) by @gtauzin
+- Add PR title validation and improve git-cliff configuration  ([#33](https://github.com/gtauzin/python-package-copier/pull/33)) by @gtauzin
 
 ### Bug Fixes
-- Extract release notes from merged CHANGELOG.md instead of regenerating  ([#25](https://github.com/gtauzin/python-package-template/pull/25)) by @gtauzin
-- Remove license classifier from template  ([#26](https://github.com/gtauzin/python-package-template/pull/26)) by @gtauzin
-- Update lint command to check types correctly  ([#27](https://github.com/gtauzin/python-package-template/pull/27)) by @gtauzin
-- Exclude _version.py from ruff and coverage reports  ([#29](https://github.com/gtauzin/python-package-template/pull/29)) by @gtauzi
+- Extract release notes from merged CHANGELOG.md instead of regenerating  ([#25](https://github.com/gtauzin/python-package-copier/pull/25)) by @gtauzin
+- Remove license classifier from template  ([#26](https://github.com/gtauzin/python-package-copier/pull/26)) by @gtauzin
+- Update lint command to check types correctly  ([#27](https://github.com/gtauzin/python-package-copier/pull/27)) by @gtauzin
+- Exclude _version.py from ruff and coverage reports  ([#29](https://github.com/gtauzin/python-package-copier/pull/29)) by @gtauzi
 
 ### Documentation
-- Document automated release workflow with git-cliff and changelog PR  ([#30](https://github.com/gtauzin/python-package-template/pull/30)) by @gtauzin
+- Document automated release workflow with git-cliff and changelog PR  ([#30](https://github.com/gtauzin/python-package-copier/pull/30)) by @gtauzin
 
 ### Contributors
 
@@ -93,14 +93,14 @@ This **minor release** includes 13 commits.
 
 
 ### Features
-- Automate release notes with git-cliff and commitizen  ([#6](https://github.com/gtauzin/python-package-template/pull/6)) by @gtauzin
-- Align template repo tooling with generated projects  ([#7](https://github.com/gtauzin/python-package-template/pull/7)) by @gtauzin
-- Enrich CHANGELOG generation with metadata and fix lint issues  ([#21](https://github.com/gtauzin/python-package-template/pull/21)) by @gtauzin
+- Automate release notes with git-cliff and commitizen  ([#6](https://github.com/gtauzin/python-package-copier/pull/6)) by @gtauzin
+- Align template repo tooling with generated projects  ([#7](https://github.com/gtauzin/python-package-copier/pull/7)) by @gtauzin
+- Enrich CHANGELOG generation with metadata and fix lint issues  ([#21](https://github.com/gtauzin/python-package-copier/pull/21)) by @gtauzin
 
 ### Bug Fixes
-- Remove non-functional include_docker prompt  ([#5](https://github.com/gtauzin/python-package-template/pull/5)) by @gtauzin
-- Use PR instead of direct push for CHANGELOG updates  ([#8](https://github.com/gtauzin/python-package-template/pull/8), [#9](https://github.com/gtauzin/python-package-template/pull/9), [#10](https://github.com/gtauzin/python-package-template/pull/10), [#11](https://github.com/gtauzin/python-package-template/pull/11)) by @gtauzin
-- Create GitHub Release after changelog PR is merged  ([#13](https://github.com/gtauzin/python-package-template/pull/13), [#15](https://github.com/gtauzin/python-package-template/pull/15), [#17](https://github.com/gtauzin/python-package-template/pull/17), [#19](https://github.com/gtauzin/python-package-template/pull/19), [#23](https://github.com/gtauzin/python-package-template/pull/23)) by @gtauzin
+- Remove non-functional include_docker prompt  ([#5](https://github.com/gtauzin/python-package-copier/pull/5)) by @gtauzin
+- Use PR instead of direct push for CHANGELOG updates  ([#8](https://github.com/gtauzin/python-package-copier/pull/8), [#9](https://github.com/gtauzin/python-package-copier/pull/9), [#10](https://github.com/gtauzin/python-package-copier/pull/10), [#11](https://github.com/gtauzin/python-package-copier/pull/11)) by @gtauzin
+- Create GitHub Release after changelog PR is merged  ([#13](https://github.com/gtauzin/python-package-copier/pull/13), [#15](https://github.com/gtauzin/python-package-copier/pull/15), [#17](https://github.com/gtauzin/python-package-copier/pull/17), [#19](https://github.com/gtauzin/python-package-copier/pull/19), [#23](https://github.com/gtauzin/python-package-copier/pull/23)) by @gtauzin
 
 ### Contributors
 

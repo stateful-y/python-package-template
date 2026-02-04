@@ -1,4 +1,4 @@
-# justfile for python-package-template
+# justfile for python-package-copier
 
 # List available commands
 default:

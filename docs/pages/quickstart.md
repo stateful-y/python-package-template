@@ -13,7 +13,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ## Create Your Package
 
 ```bash
-uvx copier copy gh:stateful-y/python-package-template my-package
+uvx copier copy gh:stateful-y/python-package-copier my-package
 ```
 
 Answer the prompts about your project. You'll be asked for:
@@ -127,4 +127,4 @@ Documentation builds automatically on every push to main.
 
 - **[Reference Guide](reference.md)** - Full command reference, CI/CD setup, testing guide
 - **[Contributing](contributing.md)** - For template developers
-- **[GitHub Template](https://github.com/stateful-y/python-package-template)** - Source code and issues
+- **[GitHub Template](https://github.com/stateful-y/python-package-copier)** - Source code and issues

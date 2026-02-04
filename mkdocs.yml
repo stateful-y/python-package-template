@@ -1,7 +1,8 @@
 site_name: Python Package Template
 site_description: A modern Python package template based on copier using uv, ruff, ty, pytest, mkdocs, and nox
 site_author: GitHub Contributors
-repo_url: https://github.com/stateful-y/python-package-template
+site_url: https://python-package-copier.readthedocs.io/
+repo_url: https://github.com/stateful-y/python-package-copier
 edit_uri: edit/main/docs/
 
 theme:
@@ -48,7 +49,10 @@ markdown_extensions:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
   - pymdownx.tabbed:
       alternate_style: true
   - tables
