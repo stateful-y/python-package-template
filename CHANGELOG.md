@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.7.0] - 2026-02-04
+
+This **minor release** includes 7 commits.
+
+
+### Features
+- Add manual approval gate for PyPI releases  ([#54](https://github.com/stateful-y/python-package-copier/pull/54)) by @gtauzin
+
+### Bug Fixes
+- Store all copier answers and add max_python_version parameter  ([#50](https://github.com/stateful-y/python-package-copier/pull/50)) by @gtauzin
+- Update repos name and add site_url to mkdocs.yml for ReadTheDocs  ([#52](https://github.com/stateful-y/python-package-copier/pull/52)) by @gtauzin
+- Change RTD build job from build to post_build stage  ([#53](https://github.com/stateful-y/python-package-copier/pull/53)) by @gtauzin
+- Add explicit UTF-8 encoding to all test file reads for Windows compatibility  ([#56](https://github.com/stateful-y/python-package-copier/pull/56)) by @gtauzin
+
+### Documentation
+- Improve template documentation with complete variable list and release workflow  ([#51](https://github.com/stateful-y/python-package-copier/pull/51)) by @gtauzin
+
+### Miscellaneous Tasks
+- Standardize test command naming across nox, justfile, and CI  ([#55](https://github.com/stateful-y/python-package-copier/pull/55)) by @gtauzin
+
+### Contributors
+
+Thanks to all contributors for this release:
+- @gtauzin
+
 ## [0.6.0] - 2026-02-03
 
 This **minor release** includes 4 commits.
