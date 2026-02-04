@@ -8,6 +8,10 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Fast tests run on every push and PR across all OS and Python versions
   test-fast:
