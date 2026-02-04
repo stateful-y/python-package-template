@@ -5,24 +5,25 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
 concurrency:
-  group: {% raw %}${{ github.workflow }}-${{ github.ref }}{% endraw %}
+  group: {% raw %}${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}{% endraw %}
   cancel-in-progress: true
 
 jobs:
-  tests:
-    name: {% raw %}Python ${{ matrix.python-version }} on ${{ matrix.os }}{% endraw %}
+  # Fast tests run on every push and PR across all OS and Python versions
+  test-fast:
+    name: {% raw %}Fast tests (Python ${{ matrix.python-version }} on ${{ matrix.os }}){% endraw %}
     runs-on: {% raw %}${{ matrix.os }}{% endraw %}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [{%- set versions = ["3.11", "3.12", "3.13", "3.14"] -%}
-          {%- for v in versions if v >= min_python_version and v <= max_python_version -%}
-            "{{ v }}"{{ ", " if not loop.last else "" }}
-          {%- endfor -%}]
+        # Draft PRs: Ubuntu only, min+max Python versions
+        # Ready PRs: All OS, min+max Python versions
+        os: {% raw %}${{ github.event.pull_request.draft && fromJSON('["ubuntu-latest"]') || fromJSON('["ubuntu-latest", "windows-latest", "macos-latest"]') }}{% endraw %}
+        python-version: ["{{ min_python_version }}", "{{ max_python_version }}"]
 
     steps:
       - name: Checkout code
@@ -45,16 +46,50 @@ jobs:
       - name: Set up Python {% raw %}${{ matrix.python-version }}{% endraw %}
         run: uv python install {% raw %}${{ matrix.python-version }}{% endraw %}
 
+      - name: Run fast tests (excluding slow/integration tests)
+        run: nox -s test_fast --python {% raw %}${{ matrix.python-version }}{% endraw %}
+
+  # Full test suite runs on Ubuntu when PR is not draft or on main branch
+  test-full:
+    name: {% raw %}Full test suite (Python ${{ matrix.python-version }}){% endraw %}
+    runs-on: ubuntu-latest
+    if: |
+      github.ref == 'refs/heads/main' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [{%- set versions = ["3.11", "3.12", "3.13", "3.14"] -%}
+          {%- for v in versions if v >= min_python_version and v <= max_python_version -%}
+            "{{ v }}"{{ ", " if not loop.last else "" }}
+          {%- endfor -%}]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: "pyproject.toml"
+
+      - name: Install nox
+        run: uv tool install nox
+
+      - name: Set up Python {% raw %}${{ matrix.python-version }}{% endraw %}
+        run: uv python install {% raw %}${{ matrix.python-version }}{% endraw %}
+
       - name: Run tests with coverage
-        if: {% raw %}matrix.os == 'ubuntu-latest' && matrix.python-version == '{% endraw %}{{ min_python_version }}{% raw %}'{% endraw %}
-        run: nox -s tests_coverage --python {% raw %}${{ matrix.python-version }}{% endraw %}
+        if: {% raw %}matrix.python-version == '{% endraw %}{{ min_python_version }}{% raw %}'{% endraw %}
+        run: nox -s test_coverage --python {% raw %}${{ matrix.python-version }}{% endraw %}
 
       - name: Run tests
-        if: {% raw %}!(matrix.os == 'ubuntu-latest' && matrix.python-version == '{% endraw %}{{ min_python_version }}{% raw %}'){% endraw %}
-        run: nox -s tests --python {% raw %}${{ matrix.python-version }}{% endraw %}
+        if: {% raw %}matrix.python-version != '{% endraw %}{{ min_python_version }}{% raw %}'{% endraw %}
+        run: nox -s test --python {% raw %}${{ matrix.python-version }}{% endraw %}
 
       - name: Upload test results to Codecov
-        if: {% raw %}${{ !cancelled() }} && matrix.os == 'ubuntu-latest' && matrix.python-version == '{% endraw %}{{ min_python_version }}{% raw %}'{% endraw %}
+        if: {% raw %}${{ !cancelled() }} && matrix.python-version == '{% endraw %}{{ min_python_version }}{% raw %}'{% endraw %}
         uses: codecov/test-results-action@v1
         with:
           token: {% raw %}${{ secrets.CODECOV_TOKEN }}{% endraw %}
@@ -62,7 +97,7 @@ jobs:
 
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v5
-        if: {% raw %}matrix.os == 'ubuntu-latest' && matrix.python-version == '{% endraw %}{{ min_python_version }}{% raw %}'{% endraw %}
+        if: {% raw %}matrix.python-version == '{% endraw %}{{ min_python_version }}{% raw %}'{% endraw %}
         with:
           token: {% raw %}${{ secrets.CODECOV_TOKEN }}{% endraw %}
           files: {% raw %}'${{ github.workspace }}/coverage.${{ matrix.python-version }}.xml'{% endraw %}

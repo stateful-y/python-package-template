@@ -11,7 +11,15 @@ install:
 
 # Run tests
 test:
-    uv run pytest
+    uv run pytest -v
+
+# Run fast tests (excludes slow and integration tests)
+test-fast:
+    uv run pytest -m "not slow and not integration" -v
+
+# Run slow tests (includes integration tests)
+test-slow:
+    uv run pytest -m "slow or integration" -v
 
 # Run tests with coverage
 test-cov:
@@ -50,7 +58,7 @@ clean:
     rm -rf build dist *.egg-info
     rm -rf .pytest_cache .ty_cache .ruff_cache
     rm -rf htmlcov .coverage coverage.xml
-    find . -type d -name __pycache__ -exec rm -rf {} +
+    find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
     find . -type f -name "*.pyc" -delete
 
 # Run all quality checks (lint, test)
@@ -58,4 +66,4 @@ check: lint test
 
 # Run pre-commit hooks on all files
 pre-commit:
-    pre-commit run --all-files
+    uvx pre-commit run --all-files

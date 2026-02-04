@@ -194,8 +194,8 @@ Central configuration containing:
 ### noxfile.py
 
 Task automation sessions:
-- `tests` - Run tests on Python 3.11-3.14
-- `tests_coverage` - Run tests with coverage
+- `test` - Run tests on Python 3.11-3.14
+- `test_coverage` - Run tests with coverage
 - `doctest` - Run docstring examples
 - `fix` - Auto-format and fix code issues
 - `lint` - Check code quality

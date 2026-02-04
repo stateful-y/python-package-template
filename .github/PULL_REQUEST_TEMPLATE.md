@@ -42,10 +42,6 @@ Fixes #
 - [ ] My changes generate no new warnings
 - [ ] I have checked that my changes don't break the template generation
 
-## Screenshots (if applicable)
-
-<!-- Add screenshots to help explain your changes -->
-
 ## Additional Notes
 
 <!-- Add any other context about the PR here -->

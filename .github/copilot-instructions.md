@@ -135,8 +135,8 @@ session.run_install("uv", "sync", "--group", "dev",
 ```
 
 **Generated project sessions**:
-- `tests_coverage`: Run tests with coverage (single Python version)
-- `tests`: Run tests across multiple Python versions (no coverage)
+- `test_coverage`: Run tests with coverage (single Python version)
+- `test`: Run tests across multiple Python versions (no coverage)
 - `doctest`: Validate docstrings with doctest
 - `examples` (if enabled): Run marimo notebooks as scripts to validate they execute
 - `fix`: Run pre-commit hooks for formatting/linting
@@ -183,15 +183,17 @@ When adding files to generated projects:
 
 ### Template Repository CI/CD
 The template repository itself has GitHub Actions workflows:
-- **`tests.yml`**: Three-tier test strategy
-  - `test-fast`: Runs unit tests only (`-m "not slow and not integration"`) on all Python versions (3.11-3.14) for every PR/push
-  - `test-integration`: Runs integration/slow tests on Python 3.11 & 3.14 only, triggered on main branch, non-draft PRs, or manual dispatch
-  - `test-full`: Runs complete test suite with coverage on main branch only
+- **`tests.yml`**: Two-tier test strategy optimized for fast feedback
+  - `test-fast`: Runs unit tests only (`-m "not slow and not integration"`) on min+max Python versions (3.11, 3.14)
+    - Draft PRs: Ubuntu only (2 jobs)
+    - Ready PRs/Main: All OS - Ubuntu, Windows, macOS (6 jobs)
+  - `test-full`: Runs complete test suite on Ubuntu across all Python versions (3.11-3.14) for ready PRs and main branch (4 jobs)
+  - `lint`: Code quality checks
 - **`changelog.yml`**: Updates CHANGELOG.md via git-cliff when version tags are pushed
 - **`publish-release.yml`**: Creates GitHub releases when changelog PR is merged (template repo does not publish to PyPI)
 - **`pr-title.yml`**: Validates PR titles follow conventional commit format
 
-**Test execution strategy**: Fast unit tests provide quick feedback on PRs (<5 min), while comprehensive integration tests validate generated projects work end-to-end (run on main or manually).
+**Test execution strategy**: Boundary version testing (min+max Python) provides quick feedback while maintaining compatibility coverage. Full test suite validates all versions comprehensively before merge.
 
 ### GitHub Actions
 Generated projects include workflows (if `include_actions: true`):

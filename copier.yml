@@ -41,6 +41,10 @@ version:
   type: str
   default: "0.1.0"
   help: "Initial package version"
+  validator: >-
+    {% if not (version | regex_search('^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$')) -%}
+    Version must follow semantic versioning format (e.g., '0.1.0', '1.2.3', '2.0.0-alpha.1', '1.0.0+build.123')
+    {%- endif %}
 
 description:
   type: str
@@ -58,7 +62,6 @@ author_email:
 github_username:
   type: str
   help: "GitHub username or organization"
-  default: ""
 
 license:
   type: str

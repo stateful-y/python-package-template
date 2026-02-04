@@ -7,22 +7,53 @@ on:
     branches: [main, "release/*"]
     types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
-    inputs:
-      run_slow_tests:
-        description: 'Run slow integration tests'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # Fast tests run on every push and PR
+  # Fast tests run on every push and PR across all OS and Python versions
   test-fast:
-    name: Fast tests (Python ${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    name: Fast tests (Python ${{ matrix.python-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
+      matrix:
+        # Draft PRs: Ubuntu only, min+max Python versions (2 jobs)
+        # Ready PRs: All OS, min+max Python versions (6 jobs)
+        os: ${{ github.event.pull_request.draft && fromJSON('["ubuntu-latest"]') || fromJSON('["ubuntu-latest", "windows-latest", "macos-latest"]') }}
+        python-version: ["3.11", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: "pyproject.toml"
+
+      - name: Add .local/bin to Windows PATH
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: echo "$USERPROFILE/.local/bin" >> $GITHUB_PATH
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Run fast tests (excluding slow/integration tests)
+        run: uvx nox -s test_fast-${{ matrix.python-version }}
+
+  # Full test suite runs on Ubuntu when PR is not draft or on main branch
+  test-full:
+    name: Full test suite (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    if: |
+      github.ref == 'refs/heads/main' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
+    strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13", "3.14"]
 
@@ -38,67 +69,8 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
 
-      - name: Run fast tests (excluding slow/integration tests)
-        run: |
-          uvx nox -s tests-${{ matrix.python-version }} -- -m "not slow and not integration" -v
-
-  # Integration tests run on main branch, non-draft PRs, or manual trigger
-  test-integration:
-    name: Integration tests
-    runs-on: ubuntu-latest
-    if: |
-      github.ref == 'refs/heads/main' ||
-      github.event.inputs.run_slow_tests == 'true' ||
-      (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.14"]  # Test oldest and newest only for speed
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: true
-          cache-dependency-glob: "pyproject.toml"
-
-      - name: Set up Python ${{ matrix.python-version }}
-        run: uv python install ${{ matrix.python-version }}
-
-      - name: Run integration tests (including slow tests)
-        run: |
-          uvx nox -s tests-${{ matrix.python-version }} -- -m "integration or slow" -v
-        timeout-minutes: 30
-
-  # Full test suite for comprehensive validation (only on main)
-  test-full:
-    name: Full test suite
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: true
-          cache-dependency-glob: "pyproject.toml"
-
-      - name: Set up Python
-        run: uv python install 3.12
-
-      - name: Run all tests with coverage
-        run: |
-          uvx nox -s tests-3.12 -- --cov --cov-report=xml -v
-        timeout-minutes: 45
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          file: ./coverage.xml
-          fail_ci_if_error: false
+      - name: Run all tests
+        run: uvx nox -s test-${{ matrix.python-version }}
 
   lint:
     name: Lint and format
