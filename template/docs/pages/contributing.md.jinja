@@ -80,11 +80,36 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/) for commi
 
 ### Running Tests
 
-Run the test suite:
+{{ project_name }} uses pytest with markers to categorize tests into different types:
+
+- **Fast tests**: Unit tests that run quickly without subprocess calls or heavy I/O
+- **Slow tests**: Tests marked with `@pytest.mark.slow` that take longer to execute
+- **Integration tests**: Tests marked with `@pytest.mark.integration` that run subprocesses or test multiple components together
+
+#### Test Commands
+
+Run fast tests only (recommended during development):
+
+```bash
+just test-fast
+# or directly: uv run pytest -m "not slow and not integration"
+# or with nox: uvx nox -s test_fast
+```
+
+Run slow and integration tests:
+
+```bash
+just test-slow
+# or directly: uv run pytest -m "slow or integration"
+# or with nox: uvx nox -s test_slow
+```
+
+Run all tests:
 
 ```bash
 just test
 # or directly: uv run pytest
+# or with nox: uvx nox -s test
 ```
 
 Run tests with coverage:
@@ -92,13 +117,55 @@ Run tests with coverage:
 ```bash
 just test-cov
 # or directly: uv run pytest --cov={{ package_name }} --cov-report=html
+# or with nox: uvx nox -s test_coverage
 ```
 
 Run tests across multiple Python versions:
 
 ```bash
-uvx nox -s tests
+uvx nox -s test
 ```
+
+#### When to Mark Tests as Slow or Integration
+
+Mark your tests appropriately to help maintain fast feedback during development:
+
+- Use `@pytest.mark.slow` for tests that:
+  - Take more than a few seconds to run
+  - Perform heavy computations
+  - Make network requests
+  - Access external resources
+
+- Use `@pytest.mark.integration` for tests that:
+  - Run subprocess commands
+  - Test multiple components working together
+  - Require complex setup or teardown
+  - Exercise end-to-end workflows
+
+Example:
+
+```python
+import pytest
+
+@pytest.mark.slow
+def test_large_computation():
+    # Long-running test
+    pass
+
+@pytest.mark.integration
+@pytest.mark.slow
+def test_end_to_end_workflow():
+    # Complex integration test
+    pass
+```
+
+#### CI Test Strategy
+
+The CI pipeline uses a two-tier testing strategy:
+
+1. **Fast tests** (`test-fast` job): Runs on every push and PR across all OS (Ubuntu, Windows, macOS) and Python versions. Provides quick feedback (typically < 5 minutes).
+
+2. **Full test suite** (`test-full` job): Runs all tests (fast + slow + integration) on Ubuntu only when the PR is not in draft mode or on the main branch. This comprehensive validation includes coverage reporting on the minimum supported Python version.
 
 ### Code Quality
 

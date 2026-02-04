@@ -9,7 +9,7 @@ nox.needs_version = ">=2024.3.2"
 nox.options.default_venv_backend = "uv|virtualenv"
 
 # Default sessions to run when nox is called without arguments
-nox.options.sessions = ["fix", "tests_coverage", "serve_docs"]
+nox.options.sessions = ["fix", "test_fast", "serve_docs"]
 
 # Generate list of Python versions from minimum to maximum
 ALL_VERSIONS = ["3.11", "3.12", "3.13", "3.14"]
@@ -19,7 +19,7 @@ PYTHON_VERSIONS = [v for v in ALL_VERSIONS if v >= MIN_VERSION and v <= MAX_VERS
 
 
 @nox.session(python=PYTHON_VERSIONS[0], venv_backend="uv")
-def tests_coverage(session: nox.Session) -> None:
+def test_coverage(session: nox.Session) -> None:
     """Run the tests with pytest and coverage under the default Python version."""
     session.env["COVERAGE_FILE"] = f".coverage.{session.python}"
     session.env["COVERAGE_PROCESS_START"] = "pyproject.toml"
@@ -57,7 +57,7 @@ def tests_coverage(session: nox.Session) -> None:
 
 
 @nox.session(python=PYTHON_VERSIONS, venv_backend="uv")
-def tests(session: nox.Session) -> None:
+def test(session: nox.Session) -> None:
     """Run the test suite across multiple Python versions (no coverage)."""
     # Install dependencies
     session.run_install(
@@ -73,6 +73,52 @@ def tests(session: nox.Session) -> None:
     session.run(
         "pytest",
         "tests",
+        *session.posargs,
+    )
+
+
+@nox.session(python=PYTHON_VERSIONS, venv_backend="uv")
+def test_fast(session: nox.Session) -> None:
+    """Run fast tests (excludes slow and integration tests)."""
+    # Install dependencies
+    session.run_install(
+        "uv",
+        "sync",
+        "--no-default-groups",
+        "--group",
+        "tests",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+    )
+
+    # Run fast tests only
+    session.run(
+        "pytest",
+        "tests",
+        "-m",
+        "not slow and not integration",
+        *session.posargs,
+    )
+
+
+@nox.session(python=PYTHON_VERSIONS, venv_backend="uv")
+def test_slow(session: nox.Session) -> None:
+    """Run slow and integration tests."""
+    # Install dependencies
+    session.run_install(
+        "uv",
+        "sync",
+        "--no-default-groups",
+        "--group",
+        "tests",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+    )
+
+    # Run slow/integration tests only
+    session.run(
+        "pytest",
+        "tests",
+        "-m",
+        "slow or integration",
         *session.posargs,
     )
 

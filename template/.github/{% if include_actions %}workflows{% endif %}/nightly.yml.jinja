@@ -28,7 +28,7 @@ jobs:
         run: uv tool install nox
 
       - name: Run tests with coverage
-        run: nox -s tests_coverage
+        run: nox -s test_coverage
 
       - name: Run docstring tests
         run: nox -s doctest

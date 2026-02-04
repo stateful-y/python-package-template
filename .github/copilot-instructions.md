@@ -135,8 +135,8 @@ session.run_install("uv", "sync", "--group", "dev",
 ```
 
 **Generated project sessions**:
-- `tests_coverage`: Run tests with coverage (single Python version)
-- `tests`: Run tests across multiple Python versions (no coverage)
+- `test_coverage`: Run tests with coverage (single Python version)
+- `test`: Run tests across multiple Python versions (no coverage)
 - `doctest`: Validate docstrings with doctest
 - `examples` (if enabled): Run marimo notebooks as scripts to validate they execute
 - `fix`: Run pre-commit hooks for formatting/linting

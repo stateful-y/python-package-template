@@ -789,7 +789,7 @@ def test_generated_tests_pass(copie):
 
     # Run tests via nox (single Python version for speed)
     test_result = subprocess.run(
-        ["uvx", "nox", "-s", "tests_coverage"],
+        ["uvx", "nox", "-s", "test_coverage"],
         cwd=result.project_dir,
         capture_output=True,
         text=True,
@@ -948,7 +948,7 @@ def test_full_project_workflow(copie):
     # Session sequence to run
     sessions = [
         ("lint", 120),
-        ("tests_coverage", 180),
+        ("test_coverage", 180),
         ("doctest", 120),
         ("run_examples", 120),
         ("build_docs", 180),

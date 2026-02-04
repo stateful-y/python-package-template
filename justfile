@@ -13,9 +13,13 @@ install:
 test:
     uv run pytest -v
 
-# Run tests with coverage
-test-cov:
-    uv run pytest --cov --cov-report=html --cov-report=term
+# Run fast tests (excludes slow and integration tests)
+test-fast:
+    uv run pytest -m "not slow and not integration" -v
+
+# Run slow tests (includes integration tests)
+test-slow:
+    uv run pytest -m "slow or integration" -v
 
 # Run linters
 lint:
@@ -53,4 +57,4 @@ all: check test
 
 # Run pre-commit hooks on all files
 pre-commit:
-    uv run pre-commit run --all-files
+    uvx pre-commit run --all-files

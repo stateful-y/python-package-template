@@ -16,20 +16,83 @@ uv run pre-commit install
 
 ## Test Template Changes
 
+The template repository uses pytest with markers to categorize tests:
+
+- **Fast tests**: Unit tests that validate template generation without running subprocesses
+- **Slow tests**: Tests marked with `@pytest.mark.slow` that take longer to execute
+- **Integration tests**: Tests marked with `@pytest.mark.integration` that use `copier.run_copy()` to generate actual projects
+
+### Test Commands
+
+Run fast tests only (recommended during development):
+
 ```bash
-# Run automated tests
-uv run pytest -v
+just test-fast
+# or directly: uv run pytest -m "not slow and not integration" -v
+# or with nox: uvx nox -s test_fast
+```
 
-# Or use just
+Run slow and integration tests:
+
+```bash
+just test-slow
+# or directly: uv run pytest -m "slow or integration" -v
+# or with nox: uvx nox -s test_slow
+```
+
+Run all tests:
+
+```bash
 just test
+# or directly: uv run pytest -v
+# or with nox: uvx nox -s test
+```
 
-# Generate a test project manually
+### When to Mark Tests
+
+Mark your tests appropriately to maintain fast feedback:
+
+- Use `@pytest.mark.slow` for tests that take more than a few seconds
+- Use `@pytest.mark.integration` for tests that run `copier.run_copy()` or execute commands in generated projects
+- Tests without marks should be fast unit tests that only validate template structure and content
+
+Example:
+
+```python
+import pytest
+
+@pytest.mark.integration
+@pytest.mark.slow
+def test_generated_project_builds(copie):
+    """Test that generated project can run nox sessions."""
+    result = copie.copy()
+    subprocess.run(["uvx", "nox", "-s", "tests"], cwd=result.project_dir, check=True)
+```
+
+### CI Test Strategy
+
+The CI pipeline uses a two-tier testing strategy:
+
+1. **Fast tests** (`test-fast` job): Runs on every push and PR across all OS (Ubuntu, Windows, macOS) and Python versions. Provides quick feedback (typically < 5 minutes).
+
+2. **Full test suite** (`test-full` job): Runs all tests (fast + slow + integration) on Ubuntu only when the PR is not in draft mode or on the main branch.
+
+### Manual Testing
+
+Generate a test project manually:
+
+```bash
 uvx copier copy . /tmp/test-project --trust
 
 # Verify the generated project works
 cd /tmp/test-project
 uv sync --group dev
-uv run pytest
+
+# Run tests
+just test-fast  # Fast tests only
+just test       # All tests
+# or: uv run pytest
+# or: uvx nox -s test_fast
 ```
 
 ## Code Quality

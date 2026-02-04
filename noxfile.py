@@ -9,11 +9,11 @@ nox.needs_version = ">=2024.3.2"
 nox.options.default_venv_backend = "uv|virtualenv"
 
 # Default sessions to run when nox is called without arguments
-nox.options.sessions = ["fix", "tests", "serve_docs"]
+nox.options.sessions = ["fix", "test_fast", "serve_docs"]
 
 
 @nox.session(python=["3.11", "3.12", "3.13", "3.14"], venv_backend="uv")
-def tests(session: nox.Session) -> None:
+def test(session: nox.Session) -> None:
     """Run the tests with pytest."""
     # Install dependencies
     session.run_install(
@@ -28,6 +28,52 @@ def tests(session: nox.Session) -> None:
     session.run(
         "pytest",
         "tests/",
+        "-v",
+        *session.posargs,
+    )
+
+
+@nox.session(python=["3.11", "3.12", "3.13", "3.14"], venv_backend="uv")
+def test_fast(session: nox.Session) -> None:
+    """Run fast tests (excludes slow and integration tests)."""
+    # Install dependencies
+    session.run_install(
+        "uv",
+        "sync",
+        "--group",
+        "tests",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+    )
+
+    # Run fast tests only
+    session.run(
+        "pytest",
+        "tests/",
+        "-m",
+        "not slow and not integration",
+        "-v",
+        *session.posargs,
+    )
+
+
+@nox.session(python=["3.11", "3.12", "3.13", "3.14"], venv_backend="uv")
+def test_slow(session: nox.Session) -> None:
+    """Run slow and integration tests."""
+    # Install dependencies
+    session.run_install(
+        "uv",
+        "sync",
+        "--group",
+        "tests",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+    )
+
+    # Run slow/integration tests only
+    session.run(
+        "pytest",
+        "tests/",
+        "-m",
+        "slow or integration",
         "-v",
         *session.posargs,
     )
