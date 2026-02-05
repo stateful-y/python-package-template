@@ -960,41 +960,6 @@ def test_lint_session_passes(copie):
 
 @pytest.mark.integration
 @pytest.mark.slow
-def test_just_lint_command_passes(copie):
-    """Test that 'just lint' command works correctly.
-
-    This validates that the just lint command correctly invokes nox lint session.
-    """
-    import shutil
-    import subprocess
-
-    if shutil.which("just") is None:
-        pytest.skip("'just' is not installed on this system")
-
-    result = copie.copy(extra_answers={"include_examples": False})
-    assert result.exit_code == 0
-
-    # Run just lint command
-    lint_result = subprocess.run(
-        ["just", "lint"],
-        cwd=result.project_dir,
-        capture_output=True,
-        text=True,
-        timeout=120,
-        check=False,
-    )
-
-    assert lint_result.returncode == 0, (
-        f"just lint failed:\nSTDOUT:\n{lint_result.stdout}\n\nSTDERR:\n{lint_result.stderr}"
-    )
-
-    # Verify ruff and ty were executed
-    output = lint_result.stdout + lint_result.stderr
-    assert "ruff" in output.lower() or "lint" in output.lower()
-
-
-@pytest.mark.integration
-@pytest.mark.slow
 def test_doctest_session_passes(copie):
     """Smoke test: run doctest session to validate docstring examples.
 
@@ -1108,6 +1073,7 @@ def test_full_project_workflow(copie):
 
     # Session sequence to run
     sessions = [
+        ("lint", 120),
         ("test_coverage", 180),
         ("doctest", 120),
         ("test_examples", 120),
