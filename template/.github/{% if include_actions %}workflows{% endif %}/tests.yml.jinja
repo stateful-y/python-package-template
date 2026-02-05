@@ -173,5 +173,5 @@ jobs:
         run: uv python install {{ min_python_version }}
 
       - name: Run example notebooks
-        run: nox -s run_examples
+        run: nox -s test_examples
 {% endif %}

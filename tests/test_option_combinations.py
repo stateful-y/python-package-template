@@ -69,12 +69,12 @@ def test_option_combinations(copie, include_examples, include_actions):
     # Test noxfile sessions
     noxfile_content = (result.project_dir / "noxfile.py").read_text(encoding="utf-8")
     if include_examples:
-        assert "def run_examples(session:" in noxfile_content, (
-            "run_examples session should exist when include_examples=True"
+        assert "def test_examples(session:" in noxfile_content, (
+            "test_examples session should exist when include_examples=True"
         )
     else:
-        assert "def run_examples(session:" not in noxfile_content, (
-            "run_examples session should not exist when include_examples=False"
+        assert "def test_examples(session:" not in noxfile_content, (
+            "test_examples session should not exist when include_examples=False"
         )
 
 

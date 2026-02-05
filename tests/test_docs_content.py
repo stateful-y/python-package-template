@@ -213,6 +213,23 @@ class TestContributingPage:
         # Should mention nox or pytest
         assert "nox" in content or "pytest" in content
 
+    def test_contributing_includes_lint_documentation(self, copie):
+        """Test that contributing page documents the lint command with all three interfaces."""
+        result = copie.copy(extra_answers={})
+        assert result.exit_code == 0
+
+        contributing = result.project_dir / "docs" / "pages" / "contributing.md"
+        content = contributing.read_text(encoding="utf-8")
+
+        # Should have lint section
+        assert "Run linters and type checkers" in content or "lint" in content.lower()
+
+        # Should document all three ways to run lint
+        assert "just lint" in content
+        assert "uvx nox -s lint" in content
+        assert "uv run ruff check src tests" in content
+        assert "uv run ty check src" in content
+
     def test_contributing_has_github_links_in_questions_section(self, copie):
         """Test that Questions section has clickable GitHub links."""
         custom_answers = {

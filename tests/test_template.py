@@ -426,25 +426,44 @@ def test_examples_directory_when_enabled(copie):
     assert "plotly" in notebook_content
     assert "num_points" in notebook_content
 
-    # Check marimo in dependencies
+    # Check marimo in dependencies and pytest marker for examples
     pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
     assert "marimo" in pyproject_content
     assert "plotly" in pyproject_content
     assert "mkdocs-marimo" in pyproject_content
+    assert "example: marks tests for example notebooks" in pyproject_content
 
-    # Check noxfile has run_examples session (export is handled by hooks)
+    # Check noxfile has test_examples session that uses pytest
     noxfile_content = (result.project_dir / "noxfile.py").read_text(encoding="utf-8")
-    assert "def run_examples(session:" in noxfile_content
-    assert "examples/hello.py" in noxfile_content
+    assert "def test_examples(session:" in noxfile_content
+    assert "pytest" in noxfile_content
+    assert "tests/test_examples.py" in noxfile_content
+    assert "-m" in noxfile_content and "example" in noxfile_content
+    assert "-n" in noxfile_content and "auto" in noxfile_content
+
+    # Check test_examples.py is created and uses pytest parametrize
+    test_examples_file = result.project_dir / "tests" / "test_examples.py"
+    assert test_examples_file.is_file(), "tests/test_examples.py not created"
+    test_examples_content = test_examples_file.read_text(encoding="utf-8")
+    assert "pytest.mark.parametrize" in test_examples_content
+    assert "pytest.mark.example" in test_examples_content
+    assert "EXAMPLES_DIR.glob" in test_examples_content
+    assert "subprocess.run" in test_examples_content
+    assert '["python", str(notebook_file)]' in test_examples_content
+    assert "https://docs.marimo.io/getting_started/quickstart/#run-as-scripts" in test_examples_content
 
     # Check docs/examples/ directory exists for exports
     docs_examples_dir = result.project_dir / "docs" / "examples"
     assert docs_examples_dir.is_dir(), "docs/examples/ directory not created"
 
-    # Check justfile has example command
+    # Check justfile has example command and test-examples command
     justfile_content = (result.project_dir / "justfile").read_text(encoding="utf-8")
-    assert "example:" in justfile_content
+    assert "example file=" in justfile_content
     assert "marimo edit" in justfile_content
+    assert "test-examples:" in justfile_content
+    assert "pytest tests/test_examples.py" in justfile_content
+    assert "-m example" in justfile_content
+    assert "-n auto" in justfile_content
 
     # Check examples.md exists and mentions standalone notebooks
     examples_md = result.project_dir / "docs" / "pages" / "examples.md"
@@ -465,17 +484,18 @@ def test_examples_directory_when_enabled(copie):
     tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
     workflow_content = tests_workflow.read_text(encoding="utf-8")
     assert "examples:" in workflow_content
-    assert "nox -s run_examples" in workflow_content
+    assert "nox -s test_examples" in workflow_content
 
     # Check README mentions examples (in "Where can I learn more?" section)
     readme_content = (result.project_dir / "README.md").read_text(encoding="utf-8")
     assert "Interactive Examples:" in readme_content or "examples/" in readme_content
     assert "marimo edit examples/hello.py" in readme_content
 
-    # Check CONTRIBUTING mentions adding examples
+    # Check CONTRIBUTING mentions adding examples with new pytest approach
     contributing_content = (result.project_dir / "docs" / "pages" / "contributing.md").read_text(encoding="utf-8")
     assert "### Adding Examples" in contributing_content
-    assert "export_examples" in contributing_content
+    assert "test_examples" in contributing_content
+    assert "python examples/" in contributing_content
 
 
 def test_examples_directory_when_disabled(copie):
@@ -506,9 +526,9 @@ def test_examples_directory_when_disabled(copie):
     # mkdocs-marimo should not be in docs dependencies
     assert "mkdocs-marimo" not in pyproject_content
 
-    # Check noxfile doesn't have run_examples session
+    # Check noxfile doesn't have test_examples session
     noxfile_content = (result.project_dir / "noxfile.py").read_text(encoding="utf-8")
-    assert "def run_examples(session:" not in noxfile_content
+    assert "def test_examples(session:" not in noxfile_content
 
     # Check justfile doesn't have example command
     justfile_content = (result.project_dir / "justfile").read_text(encoding="utf-8")
@@ -532,7 +552,7 @@ def test_examples_directory_when_disabled(copie):
     # Check GitHub workflow doesn't include examples job
     tests_workflow = result.project_dir / ".github" / "workflows" / "tests.yml"
     workflow_content = tests_workflow.read_text(encoding="utf-8")
-    assert "run_examples" not in workflow_content
+    assert "test_examples" not in workflow_content
 
 
 def test_github_actions_when_enabled(copie):
@@ -940,6 +960,41 @@ def test_lint_session_passes(copie):
 
 @pytest.mark.integration
 @pytest.mark.slow
+def test_just_lint_command_passes(copie):
+    """Test that 'just lint' command works correctly.
+
+    This validates that the just lint command correctly invokes nox lint session.
+    """
+    import shutil
+    import subprocess
+
+    if shutil.which("just") is None:
+        pytest.skip("'just' is not installed on this system")
+
+    result = copie.copy(extra_answers={"include_examples": False})
+    assert result.exit_code == 0
+
+    # Run just lint command
+    lint_result = subprocess.run(
+        ["just", "lint"],
+        cwd=result.project_dir,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+    )
+
+    assert lint_result.returncode == 0, (
+        f"just lint failed:\nSTDOUT:\n{lint_result.stdout}\n\nSTDERR:\n{lint_result.stderr}"
+    )
+
+    # Verify ruff and ty were executed
+    output = lint_result.stdout + lint_result.stderr
+    assert "ruff" in output.lower() or "lint" in output.lower()
+
+
+@pytest.mark.integration
+@pytest.mark.slow
 def test_doctest_session_passes(copie):
     """Smoke test: run doctest session to validate docstring examples.
 
@@ -1017,9 +1072,9 @@ def test_examples_session_passes(copie):
     result = copie.copy(extra_answers={"include_examples": True})
     assert result.exit_code == 0
 
-    # Run examples session (run_examples in noxfile)
+    # Run examples session (test_examples in noxfile)
     examples_result = subprocess.run(
-        ["uvx", "nox", "-s", "run_examples"],
+        ["uvx", "nox", "-s", "test_examples"],
         cwd=result.project_dir,
         capture_output=True,
         text=True,
@@ -1028,7 +1083,7 @@ def test_examples_session_passes(copie):
     )
 
     assert examples_result.returncode == 0, (
-        f"run_examples failed:\nSTDOUT:\n{examples_result.stdout}\n\nSTDERR:\n{examples_result.stderr}"
+        f"test_examples failed:\nSTDOUT:\n{examples_result.stdout}\n\nSTDERR:\n{examples_result.stderr}"
     )
 
 
@@ -1053,10 +1108,9 @@ def test_full_project_workflow(copie):
 
     # Session sequence to run
     sessions = [
-        ("lint", 120),
         ("test_coverage", 180),
         ("doctest", 120),
-        ("run_examples", 120),
+        ("test_examples", 120),
         ("build_docs", 180),
     ]
 
@@ -1340,3 +1394,134 @@ def test_max_python_version_validation_passes_when_equal_to_min(copie):
     # Should succeed
     assert result.exit_code == 0
     assert result.exception is None
+
+
+@pytest.mark.integration
+@pytest.mark.slow
+def test_example_tests_run_successfully_with_pytest(copie):
+    """Test that generated example tests run successfully using pytest directly."""
+    import subprocess
+
+    result = copie.copy(
+        extra_answers={
+            "include_examples": True,
+        },
+    )
+
+    assert result.exit_code == 0
+
+    # Install dependencies in the generated project
+    install_result = subprocess.run(
+        ["uv", "sync", "--group", "tests", "--group", "examples"],
+        cwd=result.project_dir,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+    )
+
+    assert install_result.returncode == 0, (
+        f"uv sync failed:\nSTDOUT:\n{install_result.stdout}\n\nSTDERR:\n{install_result.stderr}"
+    )
+
+    # Run the example tests using pytest directly (disable coverage for this test)
+    test_result = subprocess.run(
+        ["uv", "run", "pytest", "tests/test_examples.py", "-m", "example", "-v", "--no-cov"],
+        cwd=result.project_dir,
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+
+    assert test_result.returncode == 0, (
+        f"pytest test_examples.py failed:\nSTDOUT:\n{test_result.stdout}\n\nSTDERR:\n{test_result.stderr}"
+    )
+
+    # Verify test output shows the notebook was tested
+    assert "test_notebook_runs_without_error[" in test_result.stdout
+    assert "notebook_file" in test_result.stdout  # pytest parametrize creates notebook_file0, etc.
+    assert "passed" in test_result.stdout.lower()
+
+
+@pytest.mark.integration
+@pytest.mark.slow
+def test_example_tests_run_successfully_with_nox(copie):
+    """Test that generated example tests run successfully using nox test_examples session."""
+    import subprocess
+
+    result = copie.copy(
+        extra_answers={
+            "include_examples": True,
+        },
+    )
+
+    assert result.exit_code == 0
+
+    # Run the test_examples nox session
+    nox_result = subprocess.run(
+        ["uvx", "nox", "-s", "test_examples"],
+        cwd=result.project_dir,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+    )
+
+    assert nox_result.returncode == 0, (
+        f"nox test_examples failed:\nSTDOUT:\n{nox_result.stdout}\n\nSTDERR:\n{nox_result.stderr}"
+    )
+
+    # Verify nox output shows tests ran
+    output = nox_result.stdout + nox_result.stderr
+    assert "test_examples" in output
+    assert "passed" in output.lower() or "1 passed" in output
+
+
+@pytest.mark.integration
+@pytest.mark.slow
+def test_generated_project_all_tests_pass(copie):
+    """Test that all tests in a generated project pass, including examples."""
+    import subprocess
+
+    result = copie.copy(
+        extra_answers={
+            "include_examples": True,
+        },
+    )
+
+    assert result.exit_code == 0
+
+    # Install dependencies
+    install_result = subprocess.run(
+        ["uv", "sync", "--group", "tests", "--group", "examples"],
+        cwd=result.project_dir,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+    )
+
+    assert install_result.returncode == 0, (
+        f"uv sync failed:\nSTDOUT:\n{install_result.stdout}\n\nSTDERR:\n{install_result.stderr}"
+    )
+
+    # Run all tests (including example tests) - disable coverage
+    test_result = subprocess.run(
+        ["uv", "run", "pytest", "tests/", "-v", "--no-cov"],
+        cwd=result.project_dir,
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+
+    assert test_result.returncode == 0, (
+        f"pytest failed:\nSTDOUT:\n{test_result.stdout}\n\nSTDERR:\n{test_result.stderr}"
+    )
+
+    # Verify both regular tests and example tests ran
+    assert "test_example.py" in test_result.stdout
+    assert "test_examples.py" in test_result.stdout
+    assert "notebook_file" in test_result.stdout  # parametrized test name
+    assert "passed" in test_result.stdout.lower()

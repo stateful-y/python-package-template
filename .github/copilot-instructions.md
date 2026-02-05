@@ -29,9 +29,11 @@ Variables defined in `copier.yml` are used in `.jinja` files:
 - `{{ package_name }}`: Python import name (underscores)
 - `{{ project_slug }}`: Repository/URL name (hyphens)
 - `{{ project_name }}`: Human-readable display name
-- `{{ python_version }}`: Minimum Python version (e.g., "3.11")
+- `{{ min_python_version }}`, `{{ max_python_version }}`: Python version range (e.g., "3.11", "3.14")
 - `{{ author_name }}`, `{{ author_email }}`: Maintainer info
 - `{{ github_username }}`: GitHub org/user for URLs
+- `{{ include_actions }}`: Boolean for GitHub Actions workflows
+- `{{ include_examples }}`: Boolean for marimo examples directory
 
 See `template/pyproject.toml.jinja` and `template/noxfile.py.jinja` for usage examples.
 
@@ -190,7 +192,7 @@ session.run_install("uv", "sync", "--group", "dev",
 - `test_coverage`: Run tests with coverage (single Python version)
 - `test`: Run tests across multiple Python versions (no coverage)
 - `doctest`: Validate docstrings with doctest
-- `run_examples` (if enabled): Run marimo notebooks as scripts to validate they execute
+- `test_examples` (if enabled): Run marimo notebooks as scripts to validate they execute
 - `fix`: Run pre-commit hooks for formatting/linting/type checking
 - `lint`: Legacy session (use `fix` instead)
 - `build_docs` / `serve_docs`: Build or preview documentation
@@ -199,6 +201,7 @@ session.run_install("uv", "sync", "--group", "dev",
 The `justfile` provides convenient shortcuts that delegate to either `uv run` (simple) or `uvx nox` (complex):
 
 **Template repository commands**:
+- `just install`: Install dependencies and pre-commit hooks
 - `just test`: Run all tests
 - `just test-fast`: Fast tests only (recommended for development)
 - `just test-slow`: Slow and integration tests
@@ -206,6 +209,8 @@ The `justfile` provides convenient shortcuts that delegate to either `uv run` (s
 - `just check`: Fix + test
 - `just docs`: Build documentation
 - `just serve`: Documentation preview
+- `just clean`: Remove build artifacts, caches, and temporary files
+- `just all`: Run fix + test
 
 **Generated project commands** (same as above, plus):
 - `just test-cov`: Run tests with coverage
@@ -266,7 +271,7 @@ When adding files to generated projects:
 
 ### Version Constraints
 - Template itself: `requires-python = ">=3.11"` (in root `pyproject.toml`)
-- Generated projects: Uses `{{ python_version }}` from copier prompt
+- Generated projects: Uses `{{ min_python_version }}` and `{{ max_python_version }}` from copier prompts
 - Generated `noxfile.py.jinja` tests against multiple Python versions (3.11-3.14)
 
 ## Integration Points

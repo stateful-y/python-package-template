@@ -111,7 +111,7 @@ class TestTestsWorkflow:
         workflow_path = result.project_dir / ".github" / "workflows" / "tests.yml"
         workflow_content = workflow_path.read_text(encoding="utf-8")
 
-        # Should have examples job or run_examples
+        # Should have examples job or test_examples
         assert "example" in workflow_content.lower()
 
     def test_tests_workflow_excludes_examples_when_disabled(self, copie):
@@ -123,7 +123,7 @@ class TestTestsWorkflow:
         workflow_content = workflow_path.read_text(encoding="utf-8")
 
         # Should NOT have examples-related content
-        assert "run_examples" not in workflow_content and "run-examples" not in workflow_content
+        assert "test_examples" not in workflow_content and "run-examples" not in workflow_content
 
 
 class TestPublishWorkflow:

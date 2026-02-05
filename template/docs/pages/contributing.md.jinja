@@ -205,6 +205,29 @@ Run tests across multiple Python versions:
     ```bash
     uvx nox -s test
     ```
+{% if include_examples %}
+Run example notebook tests:
+
+=== "just"
+
+    ```bash
+    just test-examples
+    ```
+
+=== "nox"
+
+    ```bash
+    uvx nox -s test_examples
+    ```
+
+=== "uv run"
+
+    ```bash
+    uv run pytest tests/test_examples.py -m example -n auto
+    ```
+
+This runs all notebooks in the `examples/` directory as Python scripts in parallel using pytest-xdist (`-n auto`). Each notebook is executed non-interactively to validate it runs without errors.
+{% endif %}
 
 #### When to Mark Tests as Slow or Integration
 
@@ -221,6 +244,12 @@ Mark your tests appropriately to help maintain fast feedback during development:
   - Test multiple components working together
   - Require complex setup or teardown
   - Exercise end-to-end workflows
+{% if include_examples %}
+- Use `@pytest.mark.example` for tests that:
+  - Validate example notebooks execute without errors
+  - Run notebooks in the `examples/` directory
+  - Test interactive documentation and tutorials
+{% endif %}
 
 Example:
 
@@ -250,6 +279,27 @@ The CI pipeline uses a two-tier testing strategy optimized for fast feedback:
 2. **Full test suite** (`test-full` job): Runs all tests (fast + slow + integration) on Ubuntu across all Python versions ({{ min_python_version }}-{{ max_python_version }}) when the PR is not in draft mode or on the main branch. This comprehensive validation includes coverage reporting on the minimum supported Python version.
 
 ### Code Quality
+
+Run linters and type checkers:
+
+=== "just"
+
+    ```bash
+    just lint
+    ```
+
+=== "nox"
+
+    ```bash
+    uvx nox -s lint
+    ```
+
+=== "uv run"
+
+    ```bash
+    uv run ruff check src tests
+    uv run ty check src
+    ```
 
 Format code and fix issues:
 
@@ -343,30 +393,52 @@ To add a new example notebook:
 1. Create a new marimo notebook in `examples/<name>.py`:
 
    ```bash
-   marimo new examples/<name>.py
+   uv run marimo new examples/<name>.py
    ```
 
 2. Develop your example in the marimo editor
 
-3. Test it runs correctly:
+3. Test it runs correctly in interactive mode:
 
    ```bash
-   marimo edit examples/<name>.py
+   uv run marimo edit examples/<name>.py
    ```
 
-4. Export for documentation:
+4. Validate it executes as a script (how it will run in tests):
 
    ```bash
-   uvx nox -s export_examples
+   uv run python examples/<name>.py
    ```
 
-5. Add a link to your example in `docs/pages/examples.md`:
+5. Run the example test suite to verify it passes:
+
+   === "just"
+
+       ```bash
+       just test-examples
+       ```
+
+   === "nox"
+
+       ```bash
+       uvx nox -s test_examples
+       ```
+
+   === "uv run"
+
+       ```bash
+       uv run pytest tests/test_examples.py -m example
+       ```
+
+6. Add a link to your example in `docs/pages/examples.md`:
 
    ```markdown
    - [Example Name](../examples/<name>/) - Brief description
    ```
 
-6. Commit all changes including the exported HTML
+7. Commit all changes including the notebook file
+
+All notebooks in `examples/` are automatically discovered and tested by `test_examples.py` using pytest's parametrization feature, which runs them in parallel for fast validation.
 
 {% endif %}
 ## Submitting Changes

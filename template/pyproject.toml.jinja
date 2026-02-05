@@ -90,7 +90,7 @@ line-length = 120
 target-version = "py{{ min_python_version.replace('.', '') }}"
 src = ["src", "tests"]
 show-fixes = true
-exclude = ["src/{{ package_name }}/_version.py"]
+exclude = ["src/{{ package_name }}/_version.py"{% if include_examples %}, "examples/"{% endif %}]
 
 [tool.ruff.format]
 preview = true
@@ -161,7 +161,8 @@ addopts = [
 ]
 markers = [
     "integration: marks tests as integration tests that run subprocesses (deselect with '-m \"not integration\"')",
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",{% if include_examples %}
+    "example: marks tests for example notebooks (deselect with '-m \"not example\"')",{% endif %}
 ]
 
 [tool.pytest.ini_options.doctest]
