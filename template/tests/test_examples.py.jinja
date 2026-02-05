@@ -31,6 +31,7 @@ def test_notebook_runs_without_error(notebook_file: pathlib.Path) -> None:
         ["python", str(notebook_file)],
         capture_output=True,
         text=True,
+        check=False,
     )
     assert result.returncode == 0, (
         f"Notebook {notebook_file.name} failed with:\n"
