@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.8.0] - 2026-02-05
+
+This **minor release** includes 3 commits.
+
+
+### Features
+- Add pytest-based parallel example testing with lint command  ([#65](https://github.com/stateful-y/python-package-copier/pull/65)) by @gtauzin
+
+### Bug Fixes
+- Template configuration and documentation improvements  ([#64](https://github.com/stateful-y/python-package-copier/pull/64)) by @gtauzin
+
+### Refactoring
+- Simplify justfile commands to use uv directly  ([#66](https://github.com/stateful-y/python-package-copier/pull/66)) by @gtauzin
+
+### Contributors
+
+Thanks to all contributors for this release:
+- @gtauzin
+
 ## [0.7.3] - 2026-02-04
 
 This **patch release** includes 1 commit.
