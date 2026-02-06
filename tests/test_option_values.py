@@ -1,6 +1,6 @@
 """Comprehensive tests for all template option values and their propagation.
 
-This test module systematically validates that all 11 template options work correctly
+This test module systematically validates that all template options work correctly
 with custom (non-default) values, including edge cases like empty strings, unicode,
 and special characters.
 
@@ -8,7 +8,6 @@ Template options tested:
 - project_name (with auto-derivation of package_name and project_slug)
 - package_name (custom override)
 - project_slug (custom override)
-- version
 - description
 - author_name
 - author_email
@@ -18,29 +17,6 @@ Template options tested:
 - include_actions (covered in test_option_combinations.py)
 - include_examples (covered in test_option_combinations.py)
 """
-
-import pytest
-
-
-class TestVersionOption:
-    """Test the version option propagation."""
-
-    @pytest.mark.parametrize(
-        "version",
-        ["0.1.0", "1.0.0", "2.3.4", "0.0.1", "10.20.30"],
-    )
-    def test_custom_version(self, copie, version):
-        """Test that custom version values propagate to CHANGELOG.md."""
-        result = copie.copy(extra_answers={"version": version})
-        assert result.exit_code == 0
-
-        # Version should be in CHANGELOG.md (initial version)
-        changelog_content = (result.project_dir / "CHANGELOG.md").read_text(encoding="utf-8")
-        assert version in changelog_content, f"Version {version} not found in CHANGELOG.md"
-
-        # pyproject.toml uses dynamic versioning (hatch-vcs), so version is NOT there
-        pyproject_content = (result.project_dir / "pyproject.toml").read_text(encoding="utf-8")
-        assert 'dynamic = ["version"]' in pyproject_content
 
 
 class TestDescriptionOption:

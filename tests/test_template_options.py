@@ -239,7 +239,7 @@ def test_justfile_commands_comprehensive(copie):
         "test-fast:",
         "test-slow:",
         "test-cov:",
-        "doctest:",
+        "test-docstrings:",
         "fix:",  # single command for format, lint, and type check
         "build:",
         "serve:",

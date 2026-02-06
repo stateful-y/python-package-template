@@ -93,15 +93,15 @@ class TestTestsWorkflow:
         assert "python-version:" in workflow_content or "python:" in workflow_content
 
     def test_tests_workflow_includes_doctest(self, copie):
-        """Test that tests workflow includes doctest job."""
+        """Test that tests workflow includes test_docstrings job."""
         result = copie.copy(extra_answers={"include_actions": True})
         assert result.exit_code == 0
 
         workflow_path = result.project_dir / ".github" / "workflows" / "tests.yml"
         workflow_content = workflow_path.read_text(encoding="utf-8")
 
-        # Should have doctest job or step
-        assert "doctest" in workflow_content.lower()
+        # Should have test_docstrings job or step
+        assert "test_docstrings" in workflow_content.lower()
 
     def test_tests_workflow_includes_examples_when_enabled(self, copie):
         """Test that tests workflow includes examples job when enabled."""

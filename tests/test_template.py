@@ -98,13 +98,13 @@ def test_generated_project_structure(copie):
     # Check source files
     src_dir = result.project_dir / "src" / "test_project"
     assert (src_dir / "__init__.py").is_file()
-    assert (src_dir / "example.py").is_file()
+    assert (src_dir / "hello.py").is_file()
     assert (src_dir / "py.typed").is_file()
 
     # Check test files
     tests_dir = result.project_dir / "tests"
     assert (tests_dir / "conftest.py").is_file()
-    assert (tests_dir / "test_example.py").is_file()
+    assert (tests_dir / "test_hello.py").is_file()
 
     # Check docs
     docs_dir = result.project_dir / "docs"
@@ -276,9 +276,9 @@ def test_github_workflows(copie):
     # Check for ty
     assert "ty" in content, "ty not found in tests workflow"
 
-    # Check for doctest job
-    assert "doctest:" in content, "doctest job not found in tests workflow"
-    assert "nox -s doctest" in content, "doctest nox session not run in CI"
+    # Check for test_docstrings job
+    assert "test_docstrings:" in content, "test_docstrings job not found in tests workflow"
+    assert "nox -s test_docstrings" in content, "test_docstrings nox session not run in CI"
 
     # Check PR title validation workflow
     pr_title_workflow = result.project_dir / ".github" / "workflows" / "pr-title.yml"
@@ -387,20 +387,20 @@ def test_doctest_configuration(copie):
     assert "--doctest-modules" in pyproject_content
     assert "--doctest-continue-on-failure" in pyproject_content
 
-    # Check noxfile has doctest session
+    # Check noxfile has test_docstrings session
     noxfile_content = (result.project_dir / "noxfile.py").read_text(encoding="utf-8")
-    assert "def doctest(session:" in noxfile_content
+    assert "def test_docstrings(session:" in noxfile_content
     assert '"--doctest-modules"' in noxfile_content
 
-    # Check justfile has doctest command
+    # Check justfile has test-docstrings command
     justfile_content = (result.project_dir / "justfile").read_text(encoding="utf-8")
-    assert "doctest:" in justfile_content
+    assert "test-docstrings:" in justfile_content
     assert "--doctest-modules" in justfile_content
 
-    # Check example.py has docstring examples
-    example_py = (result.project_dir / "src" / "test_project" / "example.py").read_text(encoding="utf-8")
-    assert "Examples:" in example_py
-    assert ">>>" in example_py
+    # Check hello.py has docstring examples
+    hello_py = (result.project_dir / "src" / "test_project" / "hello.py").read_text(encoding="utf-8")
+    assert "Examples:" in hello_py
+    assert ">>>" in hello_py
 
 
 def test_examples_directory_when_enabled(copie):
@@ -996,7 +996,7 @@ def test_just_lint_command_passes(copie):
 @pytest.mark.integration
 @pytest.mark.slow
 def test_doctest_session_passes(copie):
-    """Smoke test: run doctest session to validate docstring examples.
+    """Smoke test: run test_docstrings session to validate docstring examples.
 
     This validates:
     - Docstring examples are syntactically correct
@@ -1007,9 +1007,9 @@ def test_doctest_session_passes(copie):
     result = copie.copy(extra_answers={"include_examples": False})
     assert result.exit_code == 0
 
-    # Run doctest session
+    # Run test_docstrings session
     doctest_result = subprocess.run(
-        ["uvx", "nox", "-s", "doctest"],
+        ["uvx", "nox", "-s", "test_docstrings"],
         cwd=result.project_dir,
         capture_output=True,
         text=True,
@@ -1196,7 +1196,6 @@ def test_copier_answers_stores_all_user_inputs(copie):
         "author_name": "Jane Developer",
         "author_email": "jane@example.com",
         "github_username": "janedev",
-        "version": "0.2.0",
         "min_python_version": "3.12",
         "max_python_version": "3.13",
         "license": "Apache-2.0",
@@ -1230,7 +1229,6 @@ def test_copier_answers_stores_all_user_inputs(copie):
     assert "package_name: my_test_pkg" in content
     assert "project_name: My Test Package" in content
     assert "project_slug: my-test-package" in content
-    assert "version: 0.2.0" in content
 
 
 def test_max_python_version_in_classifiers(copie):
@@ -1521,7 +1519,7 @@ def test_generated_project_all_tests_pass(copie):
     )
 
     # Verify both regular tests and example tests ran
-    assert "test_example.py" in test_result.stdout
+    assert "test_hello.py" in test_result.stdout
     assert "test_examples.py" in test_result.stdout
     assert "notebook_file" in test_result.stdout  # parametrized test name
     assert "passed" in test_result.stdout.lower()
