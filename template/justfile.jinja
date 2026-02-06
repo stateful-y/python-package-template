@@ -26,8 +26,8 @@ test-cov:
     uv run pytest --cov={{ package_name }} --cov-report=html --cov-report=term
 
 # Run docstring examples
-doctest:
-    uv run pytest --doctest-modules --doctest-continue-on-failure src/{{ package_name }}
+test-docstrings:
+    uv run pytest --doctest-modules --doctest-continue-on-failure --no-cov src/{{ package_name }}
 {% if include_examples %}
 # Run marimo example notebook interactively
 example file='':
@@ -35,7 +35,7 @@ example file='':
 
 # Test all example notebooks
 test-examples:
-    uv run pytest tests/test_examples.py -m example -n auto -v
+    uv run pytest tests -m example -n auto -v --no-cov
 {% endif %}
 # Run linters and type checkers
 lint:

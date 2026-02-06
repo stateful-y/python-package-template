@@ -128,7 +128,7 @@ jobs:
           uvx nox -s fix
 
 
-  doctest:
+  test_docstrings:
     name: Docstring examples
     runs-on: ubuntu-latest
 
@@ -149,7 +149,7 @@ jobs:
         run: uv python install {{ min_python_version }}
 
       - name: Run docstring tests
-        run: nox -s doctest
+        run: nox -s test_docstrings
 
 {% if include_examples %}  examples:
     name: Run example notebooks

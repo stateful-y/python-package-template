@@ -154,7 +154,7 @@ def test_examples(session: nox.Session) -> None:
     # Run example tests in parallel using pytest with pytest-xdist with no coverage
     session.run(
         "pytest",
-        "tests/test_examples.py",
+        "tests",
         "-m",
         "example",
         "-n",
@@ -166,7 +166,7 @@ def test_examples(session: nox.Session) -> None:
 {% endif %}
 
 @nox.session(venv_backend="uv")
-def doctest(session: nox.Session) -> None:
+def test_docstrings(session: nox.Session) -> None:
     """Run docstring examples with pytest."""
     # Install dependencies
     session.run_install(
@@ -183,6 +183,7 @@ def doctest(session: nox.Session) -> None:
         "pytest",
         "--doctest-modules",
         "--doctest-continue-on-failure",
+        "--no-cov",
         "src/{{ package_name }}",
         *session.posargs,
     )

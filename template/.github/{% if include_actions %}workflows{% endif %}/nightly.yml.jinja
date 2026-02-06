@@ -31,7 +31,7 @@ jobs:
         run: nox -s test_coverage
 
       - name: Run docstring tests
-        run: nox -s doctest
+        run: nox -s test_docstrings
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v5
