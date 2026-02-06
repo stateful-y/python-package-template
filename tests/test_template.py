@@ -437,9 +437,9 @@ def test_examples_directory_when_enabled(copie):
     noxfile_content = (result.project_dir / "noxfile.py").read_text(encoding="utf-8")
     assert "def test_examples(session:" in noxfile_content
     assert "pytest" in noxfile_content
-    assert "tests/test_examples.py" in noxfile_content
-    assert "-m" in noxfile_content and "example" in noxfile_content
-    assert "-n" in noxfile_content and "auto" in noxfile_content
+    assert '"tests"' in noxfile_content
+    assert '"-m"' in noxfile_content and '"example"' in noxfile_content
+    assert '"-n"' in noxfile_content and '"auto"' in noxfile_content
 
     # Check test_examples.py is created and uses pytest parametrize
     test_examples_file = result.project_dir / "tests" / "test_examples.py"
@@ -461,7 +461,7 @@ def test_examples_directory_when_enabled(copie):
     assert "example file=" in justfile_content
     assert "marimo edit" in justfile_content
     assert "test-examples:" in justfile_content
-    assert "pytest tests/test_examples.py" in justfile_content
+    assert "pytest tests" in justfile_content
     assert "-m example" in justfile_content
     assert "-n auto" in justfile_content
 
