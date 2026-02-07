@@ -813,7 +813,9 @@ def test_three_tier_documentation_system(copie):
         timeout=60,
         check=False,
     )
-    assert export_result.returncode == 0
+    assert export_result.returncode == 0, (
+        f"build_docs failed:\nSTDOUT:\n{export_result.stdout}\n\nSTDERR:\n{export_result.stderr}"
+    )
     standalone_html = result.project_dir / "docs" / "examples" / "hello" / "index.html"
     assert standalone_html.is_file(), "Standalone HTML not created (Tier 2)"
 
@@ -828,16 +830,7 @@ def test_three_tier_documentation_system(copie):
     assert "examples/**/index.html" in mkdocs_content, "mkdocs.yml doesn't exclude standalone HTML files"
     assert "examples/**/CLAUDE.md" in mkdocs_content, "mkdocs.yml doesn't exclude CLAUDE.md files"
 
-    # Tier 3: Build docs and create markdown copies
-    build_result = subprocess.run(
-        ["uvx", "nox", "-s", "build_docs"],
-        cwd=result.project_dir,
-        capture_output=True,
-        text=True,
-        timeout=120,
-        check=False,
-    )
-    assert build_result.returncode == 0
+    # Tier 3: Verify markdown copies were created
     markdown_copy = result.project_dir / "site" / "index.md"
     assert markdown_copy.is_file(), "Markdown copy not created (Tier 3)"
 
@@ -845,12 +838,6 @@ def test_three_tier_documentation_system(copie):
     assert examples_md.is_file(), "Tier 1 (embedded) missing"
     assert standalone_html.is_file(), "Tier 2 (standalone HTML) missing"
     assert markdown_copy.is_file(), "Tier 3 (markdown copies) missing"
-
-
-# ============================================================================
-# COMPREHENSIVE SMOKE TESTS (Option A)
-# These tests run all nox sessions to validate the generated project works
-# ============================================================================
 
 
 @pytest.mark.integration
