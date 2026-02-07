@@ -72,14 +72,13 @@ def test_slow(session: nox.Session) -> None:
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
 
-    # Run slow/integration tests only with parallel execution
+    # Run slow/integration tests only - no parallelization to avoid race conditions
     session.run(
         "pytest",
         "tests/",
         "-m",
         "slow or integration",
-        "-n",
-        "auto",
+        "-v",
         "-v",
         *session.posargs,
     )

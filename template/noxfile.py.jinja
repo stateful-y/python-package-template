@@ -82,6 +82,7 @@ def test(session: nox.Session) -> None:
         "tests",
         "-n",
         "auto",
+        "-v",
         *session.posargs,
     )
 
@@ -107,6 +108,7 @@ def test_fast(session: nox.Session) -> None:
         "not slow and not integration{% if include_examples %} and not example{% endif %}",
         "-n",
         "auto",
+        "-v",
         *session.posargs,
     )
 
@@ -124,14 +126,13 @@ def test_slow(session: nox.Session) -> None:
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
 
-    # Run slow/integration tests only with parallel execution
+    # Run slow/integration tests only - no parallelization to avoid race conditions
     session.run(
         "pytest",
         "tests",
         "-m",
         "slow or integration",
-        "-n",
-        "auto",
+        "-v",
         *session.posargs,
     )
 
@@ -151,14 +152,12 @@ def test_examples(session: nox.Session) -> None:
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
 
-    # Run example tests in parallel using pytest with pytest-xdist with no coverage
+    # Run example tests using pytest with no coverage - no parallelization to avoid race conditions
     session.run(
         "pytest",
         "tests",
         "-m",
         "example",
-        "-n",
-        "auto",
         "-v",
         "--no-cov",
         *session.posargs,
