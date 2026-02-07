@@ -9,17 +9,17 @@ install:
     uv sync --group dev
     uvx pre-commit install
 
-# Run tests
+# Run tests with parallel execution
 test:
-    uv run pytest -v
+    uv run pytest tests/ -n auto -v
 
 # Run fast tests (excludes slow and integration tests)
 test-fast:
-    uv run pytest -m "not slow and not integration" -v
+    uv run pytest tests/ -m "not slow and not integration" -n auto -v
 
 # Run slow tests (includes integration tests)
 test-slow:
-    uv run pytest -m "slow or integration" -v
+    uv run pytest tests/ -m "slow or integration" -n auto -v
 
 # Format and fix code (via pre-commit)
 fix:

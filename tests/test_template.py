@@ -1108,7 +1108,7 @@ def test_full_project_workflow(copie):
     # Session sequence to run
     sessions = [
         ("test_coverage", 180),
-        ("doctest", 120),
+        ("test_docstrings", 120),
         ("test_examples", 120),
         ("build_docs", 180),
     ]
