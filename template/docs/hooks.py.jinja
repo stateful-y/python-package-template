@@ -8,9 +8,8 @@ import sys
 from html.parser import HTMLParser
 from pathlib import Path
 
-{% if include_examples %}
 
-def on_pre_build(config):
+{% if include_examples %}def on_pre_build(config):
     """Export marimo notebooks before building documentation.
 
     This ensures standalone HTML versions are available when mkdocs processes files.
@@ -61,46 +60,7 @@ def on_pre_build(config):
         except FileNotFoundError:
             print("[hooks] marimo not found, skipping notebook export", file=sys.stderr)
             break
-
-
-def on_files(files, config):
-    """Copy standalone HTML notebooks before mkdocs processes files.
-
-    This ensures the files are present when mkdocs serve sets up file watching.
-    """
-    project_root = Path(__file__).parent.parent
-    docs_examples = project_root / "docs" / "examples"
-    site_dir = Path(config["site_dir"])
-
-    if not docs_examples.exists():
-        return files
-
-    # Copy standalone HTML files (excluding CLAUDE.md)
-    for html_dir in docs_examples.iterdir():
-        if not html_dir.is_dir():
-            continue
-
-        index_html = html_dir / "index.html"
-        if not index_html.exists():
-            continue
-
-        # Create target directory in site
-        target_dir = site_dir / "examples" / html_dir.name
-        target_dir.mkdir(parents=True, exist_ok=True)
-
-        # Copy index.html
-        target_file = target_dir / "index.html"
-        shutil.copy2(index_html, target_file)
-        print(f"[hooks] copied docs/examples/{html_dir.name}/index.html -> site/examples/{html_dir.name}/index.html")
-
-    return files
-{% else %}
-
-def on_files(files, config):
-    """Placeholder when examples are disabled."""
-    return files
 {% endif %}
-
 
 class _HtmlToMarkdown(HTMLParser):
     """HTML parser that converts mkdocs-material HTML to clean markdown."""
@@ -391,6 +351,33 @@ def on_post_build(config):
     """Copy markdown files for LLM consumption after build completes."""
     site_dir = Path(config["site_dir"])
     docs_dir = Path(config["docs_dir"])
+{% if include_examples %}    project_root = Path(__file__).parent.parent
+    docs_examples = project_root / "docs" / "examples"
+
+    # Copy standalone HTML example files
+    if docs_examples.exists():
+        for html_dir in docs_examples.iterdir():
+            if not html_dir.is_dir() or html_dir.name.startswith('.'):
+                continue
+
+            index_html = html_dir / "index.html"
+            if not index_html.exists():
+                continue
+
+            # Create target directory in site
+            target_dir = site_dir / "examples" / html_dir.name
+            target_dir.mkdir(parents=True, exist_ok=True)
+
+            # Copy index.html and all other files in the directory
+            for file in html_dir.iterdir():
+                if file.name == "CLAUDE.md":
+                    continue
+                target_file = target_dir / file.name
+                if file.is_file():
+                    shutil.copy2(file, target_file)
+
+            print(f"[hooks] copied examples/{html_dir.name}/ to site")
+{% endif %}
 
     # Get exclude patterns from config
     # Note: mkdocs converts exclude_docs to a GitIgnoreSpec object, so we use an empty list

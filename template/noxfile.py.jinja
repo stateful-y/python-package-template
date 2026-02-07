@@ -75,13 +75,18 @@ def test(session: nox.Session) -> None:
         "--no-default-groups",
         "--group",
         "tests",
+        "--group",
+        "examples",
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
 
-    # Run unit tests directly (no coverage for multi-version tests) with parallel execution
+    # Run unit tests and doctests with parallel execution
     session.run(
         "pytest",
         "tests",
+        "src/{{ package_name }}",
+        "--doctest-modules",
+        "--doctest-continue-on-failure",
         "-n",
         "auto",
         "-v",
@@ -143,7 +148,7 @@ def test_slow(session: nox.Session) -> None:
 {% if include_examples %}
 @nox.session(venv_backend="uv")
 def test_examples(session: nox.Session) -> None:
-    """Run marimo notebook examples to validate they execute (using pytest)."""
+    """Run marimo notebook examples to validate they execute."""
     # Install dependencies (both tests and examples groups needed)
     session.run_install(
         "uv",

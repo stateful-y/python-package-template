@@ -30,7 +30,7 @@ build:
     uv run mkdocs build --clean
 
 # Serve documentation locally
-serve: build
+serve:
     @echo "###### Starting local server. Press Control+C to stop server ######"
     uv run mkdocs serve -a localhost:8080
 

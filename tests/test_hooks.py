@@ -35,7 +35,6 @@ def test_hooks_file_created_with_examples(copie_with_examples):
     # Verify hooks content
     hooks_content = hooks_file.read_text(encoding="utf-8")
     assert "on_pre_build" in hooks_content, "on_pre_build hook not found"
-    assert "on_files" in hooks_content, "on_files hook not found"
     assert "on_post_build" in hooks_content, "on_post_build hook not found"
 
     # Verify marimo export logic is present
@@ -51,7 +50,6 @@ def test_hooks_file_created_without_examples(copie_without_examples):
 
     # Verify hooks content has minimal implementation
     hooks_content = hooks_file.read_text(encoding="utf-8")
-    assert "on_files" in hooks_content, "on_files hook not found"
     assert "on_post_build" in hooks_content, "on_post_build hook not found"
 
     # on_pre_build should not exist when examples disabled
@@ -92,8 +90,8 @@ def test_on_post_build_copies_markdown(copie_with_examples, tmp_path):
 
 @pytest.mark.integration
 @pytest.mark.slow
-def test_on_files_copies_html(copie_with_examples, tmp_path):
-    """Test that on_files hook copies standalone HTML files."""
+def test_on_post_build_copies_html(copie_with_examples, tmp_path):
+    """Test that on_post_build hook copies standalone HTML files."""
     import subprocess
 
     # First export notebooks using build_docs to trigger hooks
@@ -109,7 +107,7 @@ def test_on_files_copies_html(copie_with_examples, tmp_path):
     html_file = copie_with_examples.project_dir / "docs" / "examples" / "hello" / "index.html"
     assert html_file.is_file(), "HTML file not exported by on_pre_build"
 
-    # Verify HTML was also copied to site by the full build
+    # Verify HTML was also copied to site by on_post_build
     site_html = copie_with_examples.project_dir / "site" / "examples" / "hello" / "index.html"
     assert site_html.is_file(), "Standalone HTML not copied to site"
 
@@ -146,8 +144,8 @@ def test_on_pre_build_exports_notebooks(copie_with_examples):
     assert "marimo" in html_content.lower(), "HTML doesn't contain marimo runtime"
 
 
-def test_on_files_handles_missing_examples_dir(copie_with_examples, tmp_path):
-    """Test that on_files gracefully handles missing examples directory."""
+def test_on_post_build_handles_missing_examples_dir(copie_with_examples, tmp_path):
+    """Test that on_post_build gracefully handles missing examples directory."""
     import sys
 
     sys.path.insert(0, str(copie_with_examples.project_dir / "docs"))
@@ -158,9 +156,11 @@ def test_on_files_handles_missing_examples_dir(copie_with_examples, tmp_path):
         # Create mock config with non-existent examples
         site_dir = tmp_path / "site"
         site_dir.mkdir()
+        docs_dir = copie_with_examples.project_dir / "docs"
 
         config = {
             "site_dir": str(site_dir),
+            "docs_dir": str(docs_dir),
         }
 
         # Remove examples directory if it exists
@@ -170,11 +170,8 @@ def test_on_files_handles_missing_examples_dir(copie_with_examples, tmp_path):
 
             shutil.rmtree(docs_examples)
 
-        # Call on_files - should not raise
-        result = hooks.on_files([], config)
-
-        # Should return files unchanged
-        assert result == []
+        # Call on_post_build - should not raise
+        hooks.on_post_build(config)
 
     finally:
         sys.path.pop(0)

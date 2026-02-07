@@ -643,7 +643,6 @@ def test_markdown_docs_script_configuration(copie):
     # Verify hooks.py has all required hooks
     hooks_content = hooks_file.read_text(encoding="utf-8")
     assert "on_pre_build" in hooks_content, "on_pre_build hook not found"
-    assert "on_files" in hooks_content, "on_files hook not found"
     assert "on_post_build" in hooks_content, "on_post_build hook not found"
 
     # Check marimo export logic

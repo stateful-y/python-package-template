@@ -9,9 +9,9 @@ install:
     uv sync --group dev
     uvx pre-commit install
 
-# Run tests with parallel execution
+# Run tests and doctests with parallel execution
 test:
-    uv run pytest -n auto -v
+    uv run pytest tests src/{{ package_name }} --doctest-modules --doctest-continue-on-failure -n auto -v
 
 # Run fast tests (excludes slow and integration tests)
 test-fast:
@@ -51,7 +51,7 @@ build:
     uv run mkdocs build --clean
 
 # Serve documentation locally
-serve: build
+serve:
     @echo "###### Starting local server. Press Control+C to stop server ######"
     uv run mkdocs serve -a localhost:8080
 
